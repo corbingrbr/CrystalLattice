@@ -17,6 +17,7 @@
 #include "MatrixStack.h"
 #include "Shape.h"
 #include "Scene.h"
+#include "Crystal.h"
 
 using namespace std;
 using namespace Eigen;
@@ -48,9 +49,11 @@ static void char_callback(GLFWwindow *window, unsigned int key)
 	keyToggles[key] = !keyToggles[key];
 
 	switch (key) {
-    case 'e': scene->expand();
+    case 'e': scene->getCrystal()->expand();
         break;
-    case 'c': scene->contract();
+    case 'c': scene->getCrystal()->contract();
+        break;
+    case 't': scene->getCrystal()->toggleTranslucency();
         break;
 	}
 }
@@ -90,7 +93,8 @@ static void init()
 	// Enable alpha blending
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	
+    glEnable(GL_CULL_FACE);
+
 	progSimple = make_shared<Program>();
 	progSimple->setShaderNames(RESOURCE_DIR + "simple_vert.glsl", RESOURCE_DIR + "simple_frag.glsl");
 	progSimple->setVerbose(false); // Set this to true when debugging.
@@ -106,6 +110,7 @@ static void init()
 	prog->addUniform("MV");
 	prog->addUniform("kdFront");
 	prog->addUniform("kdBack");
+    prog->addUniform("alpha");
 	prog->addAttribute("vertPos");
 	prog->addAttribute("vertNor");
 	
@@ -134,16 +139,16 @@ void render()
 	
 	// Clear buffers
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	if(keyToggles[(unsigned)'c']) {
+	/*if(keyToggles[(unsigned)'c']) {
 		glEnable(GL_CULL_FACE);
 	} else {
 		glDisable(GL_CULL_FACE);
-	}
+        }
 	if(keyToggles[(unsigned)'l']) {
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	} else {
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	}
+        }*/
 	
 	auto P = make_shared<MatrixStack>();
 	auto MV = make_shared<MatrixStack>();

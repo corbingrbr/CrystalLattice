@@ -23,10 +23,9 @@ public:
     void draw(std::shared_ptr<MatrixStack> MV, const std::shared_ptr<Program> prog);
     void expand();
     void contract();
+    void toggleTranslucency();
 
 private:
-    
-    //void genStructure();
 
     int type;
     int rows;
@@ -34,6 +33,7 @@ private:
     int height;
     float scale;
     float expansion;
+    bool translucent;
 
     std::shared_ptr<UnitCell> unit;
     std::shared_ptr<Shape> eighth;

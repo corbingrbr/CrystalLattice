@@ -24,16 +24,16 @@ public:
 	virtual ~Scene();
 	
 	void load(const std::string &RESOURCE_DIR);
-	void update();
-    void expand();
-    void contract();
+    void nextCrystal();
+    std::shared_ptr<Crystal> getCrystal();
     void draw(std::shared_ptr<MatrixStack> MV, const std::shared_ptr<Program> prog);
     
 
 private:
-
+    
+    int whichCrystal;
     std::shared_ptr<Shape> eighth;
-    std::shared_ptr<Crystal> simpleCrystal;
+    std::vector<std::shared_ptr<Crystal> > crystals;
     
 
 };

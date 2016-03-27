@@ -4,6 +4,7 @@
 #include <iostream>
 #include "MatrixStack.h"
 #include "UnitCell.h"
+#include "Program.h"
 #include "SimpleCubic.h"
 //#include "BodyCentered.h"
 //#include "FaceCentered.h"
@@ -14,12 +15,13 @@ using namespace std;
 using namespace Eigen;
 
 Crystal::Crystal(int type, shared_ptr<Shape> shape) :
-    expansion(1.0)
+    expansion(1.0),
+    translucent(false)
 {
     this->type = type;
     this->eighth = shape;
-    this->rows = 5;
-    this->cols = 5; 
+    this->rows = 3;
+    this->cols = 3; 
     this->height = 3; 
     this->scale = .1;
 }
@@ -45,14 +47,19 @@ void Crystal::init()
         unitCell = make_shared<FaceCentered>();
         break;
         }*/
-
-    // Create Structure from unit cells
-    //genStructure();
     
 }
 
 void Crystal::draw(shared_ptr<MatrixStack> MV, const shared_ptr<Program> prog)
 {
+    float alpha = translucent ? 0.3 : 1.0;
+
+    glUniform1f(prog->getUniform("alpha"), alpha);
+
+    int midi = cols/2;
+    int midj = rows/2;
+    int midk = height/2;
+
     MV->pushMatrix();
     MV->scale(scale);
     
@@ -69,7 +76,19 @@ void Crystal::draw(shared_ptr<MatrixStack> MV, const shared_ptr<Program> prog)
             MV->pushMatrix();
             
             for (int k = 0; k < height; k++) {
-                unit->draw(MV, prog);
+                // Aesthetics for center unit cell
+                if (translucent && i == midi && j == midj && k == midk) {
+                   
+                    glUniform3fv(prog->getUniform("kdFront"), 1, Vector3f(0.0, 0.7, 1.0).data());
+                    glUniform1f(prog->getUniform("alpha"), 1.0);
+                    unit->draw(MV, prog);
+                    glUniform3fv(prog->getUniform("kdFront"), 1, Vector3f(0.5, 0.5, 0.5).data());
+                    glUniform1f(prog->getUniform("alpha"), alpha);
+                    
+                } else {
+                    unit->draw(MV, prog);
+                }
+
                 MV->translate(Vector3f(0.0, 2.0*expansion, 0)); // Move up one -> y+
             }
 
@@ -88,10 +107,15 @@ void Crystal::draw(shared_ptr<MatrixStack> MV, const shared_ptr<Program> prog)
 
 void Crystal::expand()
 {
-    expansion += .2;
+    if (expansion < 4.0) { expansion += .2; }
 }
 
 void Crystal::contract()
 {
     if (expansion > 1.0) { expansion -= .2; }
+}
+
+void Crystal::toggleTranslucency()
+{
+    translucent = !translucent;
 }

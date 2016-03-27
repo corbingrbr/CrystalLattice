@@ -4,6 +4,7 @@ varying vec3 fragPos; // in camera space
 varying vec3 fragNor; // in camera space
 uniform vec3 kdFront;
 uniform vec3 kdBack;
+uniform float alpha;
 
 void main()
 {   
@@ -20,5 +21,5 @@ void main()
 	}
 	vec3 diffuse = ln * kd;
 	vec3 color = diffuse;
-	gl_FragColor = vec4(color, 1.0);
+	gl_FragColor = vec4(color, alpha);
 }
