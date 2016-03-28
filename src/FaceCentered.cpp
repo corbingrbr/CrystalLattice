@@ -1,4 +1,4 @@
-#include "SimpleCubic.h"
+#include "FaceCentered.h"
 #include "UnitCell.h"
 #include "Shape.h"
 #include "Program.h"
@@ -7,29 +7,21 @@
 
 #include <Eigen/Dense>
 #include <iostream>
-#include <map>
 
 using namespace std;
 using namespace Eigen;
 
-SimpleCubic::SimpleCubic(shared_ptr<Shape> eighth, shared_ptr<Shape> sphere, map<string, Vector3f> colors)
+FaceCentered::FaceCentered(shared_ptr<Shape> eighth, shared_ptr<Shape> sphere, map<string, Vector3f> colors)
     : UnitCell(eighth, sphere, colors)
 {
 }
 
-SimpleCubic::~SimpleCubic()
+FaceCentered::~FaceCentered()
 {
 }
 
-void SimpleCubic::draw(shared_ptr<MatrixStack> MV, shared_ptr<Program> prog, float alpha, bool center) 
+void FaceCentered::draw(shared_ptr<MatrixStack> MV, shared_ptr<Program> prog, float alpha, bool center) 
 {
-    if (center && alpha < 1.0) {
-        glUniform1f(prog->getUniform("alpha"), 1.0);
-        glUniform3fv(prog->getUniform("kdFront"), 1, colors["blue"].data());
-    } else {
-        glUniform3fv(prog->getUniform("kdFront"), 1, colors["grey"].data());
-    }
-
     MV->pushMatrix();
     
     drawEighth(MV, prog, 0);
@@ -50,11 +42,9 @@ void SimpleCubic::draw(shared_ptr<MatrixStack> MV, shared_ptr<Program> prog, flo
     MV->popMatrix();
     
     MV->popMatrix();
-
-    glUniform1f(prog->getUniform("alpha"), alpha); // Make sure alpha is same as it was 
 }
 
-void SimpleCubic::drawEighth(shared_ptr<MatrixStack> MV, shared_ptr<Program> prog, float rot) {
+void FaceCentered::drawEighth(shared_ptr<MatrixStack> MV, shared_ptr<Program> prog, float rot) {
     
     MV->pushMatrix();
     

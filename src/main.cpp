@@ -49,11 +49,13 @@ static void char_callback(GLFWwindow *window, unsigned int key)
 	keyToggles[key] = !keyToggles[key];
 
 	switch (key) {
-    case 'e': scene->getCrystal()->expand();
+    case 'e': scene->expand();
         break;
-    case 'c': scene->getCrystal()->contract();
+    case 'c': scene->contract();
         break;
-    case 't': scene->getCrystal()->toggleTranslucency();
+    case 't': scene->toggleTranslucency();
+        break;
+    case 'n': scene->nextCrystal();
         break;
 	}
 }
@@ -149,6 +151,8 @@ void render()
 	} else {
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         }*/
+
+    
 	
 	auto P = make_shared<MatrixStack>();
 	auto MV = make_shared<MatrixStack>();

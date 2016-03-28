@@ -16,7 +16,7 @@ void main()
 	vec3 kd = kdFront;
 	float ln = dot(l, n);
 	if(ln < 0.0) {
-		kd = kdBack;
+		//kd = kdBack;
 		ln = -ln;
 	}
 	vec3 diffuse = ln * kd;
