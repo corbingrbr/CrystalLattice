@@ -5,6 +5,7 @@
 #include <map>
 #include <vector>
 #include <string>
+#include <utility>
 
 #include <Eigen/Dense>
 
@@ -30,6 +31,15 @@ public:
     void toggleTranslucency();
 
 private:
+    
+    void initCellPositions();
+    float calcCellDistance(Eigen::Matrix4f m, Eigen::Vector4f v);
+    void sortCells(Eigen::Matrix4f viewMatrix);
+    
+    static bool sortAlg(std::pair<float, Eigen::Vector4f> i, std::pair<float, Eigen::Vector4f> j)
+    {
+        return i.first > j.first;
+    }
 
     int type;
     int rows;
@@ -43,6 +53,7 @@ private:
     std::shared_ptr<Shape> eighth;
     std::shared_ptr<Shape> sphere;
     std::map<std::string, Eigen::Vector3f> colors;
+    std::vector<std::pair<float, Eigen::Vector4f> > cells;
 };
 
 #endif

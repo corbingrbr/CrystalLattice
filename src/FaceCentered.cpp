@@ -20,10 +20,13 @@ FaceCentered::~FaceCentered()
 {
 }
 
-void FaceCentered::draw(shared_ptr<MatrixStack> MV, shared_ptr<Program> prog, float alpha, bool center) 
+void FaceCentered::draw(shared_ptr<MatrixStack> MV, shared_ptr<Program> prog, Vector3f pos, float alpha, bool center) 
 {
     MV->pushMatrix();
-    
+    MV->translate(pos);
+
+    MV->pushMatrix();
+
     drawEighth(MV, prog, 0);
     drawEighth(MV, prog, 90);
     drawEighth(MV, prog, 180);
@@ -41,6 +44,7 @@ void FaceCentered::draw(shared_ptr<MatrixStack> MV, shared_ptr<Program> prog, fl
     
     MV->popMatrix();
     
+    MV->popMatrix();
     MV->popMatrix();
 }
 

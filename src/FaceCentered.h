@@ -18,7 +18,7 @@ public:
    
     FaceCentered(std::shared_ptr<Shape> eighth, std::shared_ptr<Shape> sphere, std::map<std::string, Eigen::Vector3f> colors);
     virtual ~FaceCentered();
-    void draw(std::shared_ptr<MatrixStack> MV, std::shared_ptr<Program> prog, float alpha, bool center);
+    void draw(std::shared_ptr<MatrixStack> MV, std::shared_ptr<Program> prog, Eigen::Vector3f pos, float alpha, bool center);
     
 private:
     void drawEighth(std::shared_ptr<MatrixStack> MV, std::shared_ptr<Program> prog, float rot);

@@ -21,7 +21,7 @@ SimpleCubic::~SimpleCubic()
 {
 }
 
-void SimpleCubic::draw(shared_ptr<MatrixStack> MV, shared_ptr<Program> prog, float alpha, bool center) 
+void SimpleCubic::draw(shared_ptr<MatrixStack> MV, shared_ptr<Program> prog, Vector3f pos, float alpha, bool center) 
 {
     if (center && alpha < 1.0) {
         glUniform1f(prog->getUniform("alpha"), 1.0);
@@ -29,7 +29,10 @@ void SimpleCubic::draw(shared_ptr<MatrixStack> MV, shared_ptr<Program> prog, flo
     } else {
         glUniform3fv(prog->getUniform("kdFront"), 1, colors["grey"].data());
     }
-
+    
+    MV->pushMatrix();
+    MV->translate(pos);
+    
     MV->pushMatrix();
     
     drawEighth(MV, prog, 0);
@@ -49,6 +52,7 @@ void SimpleCubic::draw(shared_ptr<MatrixStack> MV, shared_ptr<Program> prog, flo
     
     MV->popMatrix();
     
+    MV->popMatrix();
     MV->popMatrix();
 
     glUniform1f(prog->getUniform("alpha"), alpha); // Make sure alpha is same as it was 

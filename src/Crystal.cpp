@@ -10,6 +10,8 @@
 #include "FaceCentered.h"
 
 #include <Eigen/Dense>
+#include <utility>
+#include <algorithm>
 
 using namespace std;
 using namespace Eigen;
@@ -33,6 +35,9 @@ Crystal::~Crystal()
 
 void Crystal::init()
 {
+    initCellPositions();
+    
+    // Setup colors
     colors["grey"] = Vector3f(0.5, 0.5, 0.5);
     colors["red"] = Vector3f(1.0, 0, 0);
     colors["green"] = Vector3f(0, 1.0, 0);
@@ -58,44 +63,21 @@ void Crystal::init()
 
 void Crystal::draw(shared_ptr<MatrixStack> MV, const shared_ptr<Program> prog)
 {
+    sortCells(MV->topMatrix());
+
     float alpha = translucent ? 0.3 : 1.0;
 
     glUniform1f(prog->getUniform("alpha"), alpha);
 
-    int midi = cols/2;
-    int midj = rows/2;
-    int midk = height/2;
-
     MV->pushMatrix();
     MV->scale(scale);
     
-    // Translate so structure will be centered at origin
-    MV->translate(Vector3f(-(cols-1)*expansion, 
-                           -(height-1)*expansion,
-                           -(rows-1)*expansion)); 
-
-    // Draw all unitCells
-    for (int i = 0; i < cols; i++) {
-        MV->pushMatrix();
-        
-        for (int j = 0; j < rows; j++) {
-            MV->pushMatrix();
-            
-            for (int k = 0; k < height; k++) {
-                // Draw unit cell
-                unit->draw(MV, prog, alpha, (i == midi && j == midj && k == midk)); 
-
-                MV->translate(Vector3f(0.0, 2.0*expansion, 0)); // Move up one -> y+
-            }
-
-            MV->popMatrix();
-
-            MV->translate(Vector3f(0, 0, 2.0*expansion)); // Move one row -> z+
-        }
-
-        MV->popMatrix();
-
-        MV->translate(Vector3f(2.0*expansion, 0, 0)); // Move one column -> x+
+    unit->draw(MV, prog, Vector3f(0,0,0), alpha, true); 
+    
+    for (unsigned int i = 0; i < cells.size(); i++) {
+        Vector3f v = cells[i].second.head<3>(); // Vector for cell positioning
+        v *= expansion; // Adjust cell positioning by any expansion
+        unit->draw(MV, prog, v, alpha, false); // Draw cell
     }
 
     MV->popMatrix();
@@ -114,4 +96,42 @@ void Crystal::contract()
 void Crystal::toggleTranslucency()
 {
     translucent = !translucent;
+}
+
+float Crystal::calcCellDistance(Matrix4f m, Vector4f v)
+{
+    Vector4f v2 = m * v;
+    
+    return v2(0)*v2(0) + v2(1)*v2(1) + v2(2)*v2(2);
+}
+
+void Crystal::initCellPositions()
+{
+    int midi = cols/2;
+    int midj = rows/2;
+    int midk = height/2;
+
+    // Offset
+    Vector3f o(-(cols-1), -(height-1), -(rows-1));
+
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < cols; j++) {
+            for (int k = 0; k < height; k++) {
+                if (i != midi || j != midj || k != midk) {
+                    cells.push_back(make_pair(0, Vector4f(o(0) + j*2, o(1) + k*2, o(2) + i*2 , 1)));
+                }
+            }
+        }
+    }
+}
+
+void Crystal::sortCells(Matrix4f viewMatrix)
+{
+    // Calculate all cells distances
+    for (unsigned int i = 0; i < cells.size(); i++) {
+        cells[i].first = calcCellDistance(viewMatrix, cells[i].second);
+    }
+    
+    // Sort cells in descending order by distance from camera
+    sort(cells.begin(), cells.end(), sortAlg);
 }

@@ -22,7 +22,7 @@ BodyCentered::~BodyCentered()
 {
 }
 
-void BodyCentered::draw(shared_ptr<MatrixStack> MV, shared_ptr<Program> prog, float alpha, bool center)
+void BodyCentered::draw(shared_ptr<MatrixStack> MV, shared_ptr<Program> prog, Vector3f pos, float alpha, bool center)
 {
      if (center && alpha < 1.0) { 
         glUniform1f(prog->getUniform("alpha"), 1.0);
@@ -34,6 +34,9 @@ void BodyCentered::draw(shared_ptr<MatrixStack> MV, shared_ptr<Program> prog, fl
          glUniform3fv(prog->getUniform("kdFront"), 1, colors["grey"].data());
      }
      
+     MV->pushMatrix();
+     MV->translate(pos);
+
      // Draw center atom
      MV->pushMatrix();
      MV->scale(0.5);
@@ -63,6 +66,7 @@ void BodyCentered::draw(shared_ptr<MatrixStack> MV, shared_ptr<Program> prog, fl
     
      MV->popMatrix();
     
+     MV->popMatrix();
      MV->popMatrix();
 
      glUniform1f(prog->getUniform("alpha"), alpha); // Make sure alpha is same as it was 
