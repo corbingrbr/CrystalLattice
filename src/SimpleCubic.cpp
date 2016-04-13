@@ -12,8 +12,8 @@
 using namespace std;
 using namespace Eigen;
 
-SimpleCubic::SimpleCubic(shared_ptr<Shape> eighth, shared_ptr<Shape> sphere, map<string, Vector3f> colors)
-    : UnitCell(eighth, sphere, colors)
+SimpleCubic::SimpleCubic(shared_ptr<Shape> eighth, shared_ptr<Shape> half, shared_ptr<Shape> sphere, map<string, Vector3f> colors)
+    : UnitCell(eighth, half, sphere, colors)
 {
 }
 
@@ -32,7 +32,7 @@ void SimpleCubic::draw(shared_ptr<MatrixStack> MV, shared_ptr<Program> prog, Vec
     
     MV->pushMatrix();
     MV->translate(pos);
-    
+
     MV->pushMatrix();
     
     drawEighth(MV, prog, 0);
@@ -64,8 +64,19 @@ void SimpleCubic::drawEighth(shared_ptr<MatrixStack> MV, shared_ptr<Program> pro
     
     MV->rotate(rot, Vector3f(0.0, 1.0, 0.0));
     MV->translate(Vector3f(1.0, -1.0, -1.0));
+    MV->scale(scale);
     glUniformMatrix4fv(prog->getUniform("MV"), 1, GL_FALSE, MV->topMatrix().data());
     eighth->draw(prog);
     
     MV->popMatrix();
 }
+
+void SimpleCubic::scaleUp()
+{
+    if (scale > 0.5) { scale -= .01; }
+}
+
+void SimpleCubic::scaleDown()
+{
+    if (scale < 1.0) { scale += .01; }
+} 

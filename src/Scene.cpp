@@ -4,6 +4,8 @@
 #include "Shape.h"
 #include "Program.h"
 #include "Crystal.h"
+#include "MatrixStack.h"
+#include <Eigen/Dense>
 
 using namespace std;
 using namespace Eigen;
@@ -23,14 +25,21 @@ void Scene::load(const string &RESOURCE_DIR)
     eighth->loadMesh(RESOURCE_DIR + "eighth.obj");
     eighth->init();
     
+    half = make_shared<Shape>();
+    half->loadMesh(RESOURCE_DIR + "half.obj");
+    half->init();
+
     sphere = make_shared<Shape>();
     sphere->loadMesh(RESOURCE_DIR + "sphere.obj");
     sphere->init();
 
-    crystals.push_back(make_shared<Crystal>(Crystal::SIMPLE, eighth, sphere));
+    crystals.push_back(make_shared<Crystal>(Crystal::SIMPLE, eighth, half, sphere));
     crystals.back()->init();
     
-    crystals.push_back(make_shared<Crystal>(Crystal::BODY, eighth, sphere));
+    crystals.push_back(make_shared<Crystal>(Crystal::BODY, eighth, half, sphere));
+    crystals.back()->init();
+
+    crystals.push_back(make_shared<Crystal>(Crystal::FACE, eighth, half, sphere));
     crystals.back()->init();
 }
 
@@ -62,6 +71,20 @@ void Scene::contract()
      for (unsigned int i = 0; i < crystals.size(); i++) {
          crystals[i]->contract();
      }
+}
+
+void Scene::scaleUp()
+{
+    for (unsigned int i = 0; i < crystals.size(); i++) {
+         crystals[i]->scaleUp();
+    }
+}
+
+void Scene::scaleDown()
+{
+    for (unsigned int i = 0; i < crystals.size(); i++) {
+         crystals[i]->scaleDown();
+    }
 }
 
 void Scene::toggleTranslucency()

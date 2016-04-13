@@ -47,6 +47,7 @@ void Shape::init()
 	glBindBuffer(GL_ARRAY_BUFFER, posBufID);
 	glBufferData(GL_ARRAY_BUFFER, posBuf.size()*sizeof(float), &posBuf[0], GL_STATIC_DRAW);
 	
+
 	// Send the normal array to the GPU
 	if(norBuf.empty()) {
 		norBufID = 0;
@@ -77,12 +78,20 @@ void Shape::init()
 
 void Shape::draw(const shared_ptr<Program> prog) const
 {
+    //cout << endl;
+    //cout << "HERE 1" << endl;
+
 	// Bind position buffer
 	int h_pos = prog->getAttribute("vertPos");
+    //cout << "HERE 1.2" << endl;
 	GLSL::enableVertexAttribArray(h_pos);
+    //cout << "HERE 1.3" << endl;
 	glBindBuffer(GL_ARRAY_BUFFER, posBufID);
+    // cout << "HERE 1.4" << endl;
 	glVertexAttribPointer(h_pos, 3, GL_FLOAT, GL_FALSE, 0, (const void *)0);
 	
+    //cout << "HERE 2" << endl;
+
 	// Bind normal buffer
 	int h_nor = prog->getAttribute("vertNor");
 	if(h_nor != -1 && norBufID != 0) {
@@ -91,9 +100,12 @@ void Shape::draw(const shared_ptr<Program> prog) const
 		glVertexAttribPointer(h_nor, 3, GL_FLOAT, GL_FALSE, 0, (const void *)0);
 	}
 	
+    //cout << "HERE 3" << endl;
+
 	// Bind element buffer
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eleBufID);
-	
+    //cout << "HERE 4" << endl;
+
 	// Draw
 	glDrawElements(GL_TRIANGLES, (int)eleBuf.size(), GL_UNSIGNED_INT, (const void *)0);
 	

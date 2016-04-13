@@ -8,6 +8,7 @@
 #include "SimpleCubic.h"
 #include "BodyCentered.h"
 #include "FaceCentered.h"
+#include "Shape.h"
 
 #include <Eigen/Dense>
 #include <utility>
@@ -16,12 +17,13 @@
 using namespace std;
 using namespace Eigen;
 
-Crystal::Crystal(int type, shared_ptr<Shape> eighth, shared_ptr<Shape> sphere) :
+Crystal::Crystal(int type, shared_ptr<Shape> eighth, shared_ptr<Shape> half, shared_ptr<Shape> sphere) :
     expansion(1.0),
     translucent(false)
 {
     this->type = type;
     this->eighth = eighth;
+    this->half = half;
     this->sphere = sphere;
     this->rows = 3;
     this->cols = 3; 
@@ -48,13 +50,13 @@ void Crystal::init()
     switch (type) {
         
     case SIMPLE:
-        unit = make_shared<SimpleCubic>(eighth, sphere, colors);
+        unit = make_shared<SimpleCubic>(eighth, half, sphere, colors);
         break;
     case BODY:
-        unit = make_shared<BodyCentered>(eighth, sphere, colors);
+        unit = make_shared<BodyCentered>(eighth, half, sphere, colors);
         break;
     case FACE:
-        unit = make_shared<FaceCentered>(eighth, sphere, colors);
+        unit = make_shared<FaceCentered>(eighth, half, sphere, colors);
         break;
     
     }
@@ -63,6 +65,7 @@ void Crystal::init()
 
 void Crystal::draw(shared_ptr<MatrixStack> MV, const shared_ptr<Program> prog)
 {
+    
     sortCells(MV->topMatrix());
 
     float alpha = translucent ? 0.3 : 1.0;
@@ -91,6 +94,16 @@ void Crystal::expand()
 void Crystal::contract()
 {
     if (expansion > 1.0) { expansion -= .2; }
+}
+
+void Crystal::scaleUp()
+{
+    unit->scaleUp();
+}
+
+void Crystal::scaleDown()
+{
+    unit->scaleDown();
 }
 
 void Crystal::toggleTranslucency()

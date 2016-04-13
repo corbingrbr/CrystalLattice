@@ -53,6 +53,10 @@ static void char_callback(GLFWwindow *window, unsigned int key)
         break;
     case 'c': scene->contract();
         break;
+    case 'y': scene->scaleDown();
+        break;
+    case 'u': scene->scaleUp();
+        break;
     case 't': scene->toggleTranslucency();
         break;
     case 'n': scene->nextCrystal();
@@ -111,7 +115,7 @@ static void init()
 	prog->addUniform("P");
 	prog->addUniform("MV");
 	prog->addUniform("kdFront");
-	prog->addUniform("kdBack");
+	//prog->addUniform("kdBack");
     prog->addUniform("alpha");
 	prog->addAttribute("vertPos");
 	prog->addAttribute("vertNor");

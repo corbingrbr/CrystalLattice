@@ -22,12 +22,14 @@ public:
     enum Type { SIMPLE, BODY, FACE };        
 
     
-    Crystal(int type, std::shared_ptr<Shape> eighth, std::shared_ptr<Shape> sphere);
+    Crystal(int type, std::shared_ptr<Shape> eighth, std::shared_ptr<Shape> half, std::shared_ptr<Shape> sphere);
     virtual ~Crystal();
     void init();
     void draw(std::shared_ptr<MatrixStack> MV, const std::shared_ptr<Program> prog);
     void expand();
     void contract();
+    void scaleDown();
+    void scaleUp();
     void toggleTranslucency();
 
 private:
@@ -51,6 +53,7 @@ private:
 
     std::shared_ptr<UnitCell> unit;
     std::shared_ptr<Shape> eighth;
+    std::shared_ptr<Shape> half;
     std::shared_ptr<Shape> sphere;
     std::map<std::string, Eigen::Vector3f> colors;
     std::vector<std::pair<float, Eigen::Vector4f> > cells;
