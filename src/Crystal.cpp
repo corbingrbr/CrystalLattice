@@ -25,9 +25,9 @@ Crystal::Crystal(int type, shared_ptr<Shape> eighth, shared_ptr<Shape> half, sha
     this->eighth = eighth;
     this->half = half;
     this->sphere = sphere;
-    this->rows = 3;
-    this->cols = 3; 
-    this->height = 3; 
+    this->rows = 5; // only works with odd atm
+    this->cols = 5;
+    this->height = 5; 
     this->scale = .1;
 }
 
@@ -75,12 +75,14 @@ void Crystal::draw(shared_ptr<MatrixStack> MV, const shared_ptr<Program> prog)
     MV->pushMatrix();
     MV->scale(scale);
     
-    unit->draw(MV, prog, Vector3f(0,0,0), alpha, true); 
+    unit->draw(MV, prog, Vector3f(0,0,0), alpha, true, Vector3d(1,1,1)); 
     
     for (unsigned int i = 0; i < cells.size(); i++) {
-        Vector3f v = cells[i].second.head<3>(); // Vector for cell positioning
+        Vector3f v = cells[i].second.second.head<3>(); // Vector for cell positioning
+        Vector3d ndx = cells[i].second.first;
         v *= expansion; // Adjust cell positioning by any expansion
-        unit->draw(MV, prog, v, alpha, false); // Draw cell
+
+        unit->draw(MV, prog, v, alpha, false, ndx); // Draw cell
     }
 
     MV->popMatrix();
@@ -131,7 +133,23 @@ void Crystal::initCellPositions()
         for (int j = 0; j < cols; j++) {
             for (int k = 0; k < height; k++) {
                 if (i != midi || j != midj || k != midk) {
-                    cells.push_back(make_pair(0, Vector4f(o(0) + j*2, o(1) + k*2, o(2) + i*2 , 1)));
+                    
+                    int x = UnitCell::MIDDLE;
+                    int y = UnitCell::MIDDLE;
+                    int z = UnitCell::MIDDLE;
+
+                    if (i == 0) { x = UnitCell::MIN; }
+                    if (i == rows-1) { x = UnitCell::MAX; }
+                    if (j == 0) { y = UnitCell::MIN; }
+                    if (j == cols-1) { y = UnitCell::MAX; }
+                    if (k == 0) { z = UnitCell::MIN; }
+                    if (k == height-1) { z = UnitCell::MAX; }
+
+
+                    Vector3d ndx(y, z, x);
+                    Vector4f pos(o(0) + j*2, o(1) + k*2, o(2) + i*2 , 1);
+
+                    cells.push_back(make_pair(0, make_pair(ndx, pos)));
                 }
             }
         }
@@ -142,7 +160,7 @@ void Crystal::sortCells(Matrix4f viewMatrix)
 {
     // Calculate all cells distances
     for (unsigned int i = 0; i < cells.size(); i++) {
-        cells[i].first = calcCellDistance(viewMatrix, cells[i].second);
+        cells[i].first = calcCellDistance(viewMatrix, cells[i].second.second);
     }
     
     // Sort cells in descending order by distance from camera

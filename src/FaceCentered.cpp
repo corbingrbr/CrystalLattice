@@ -21,7 +21,7 @@ FaceCentered::~FaceCentered()
 {
 }
 
-void FaceCentered::draw(shared_ptr<MatrixStack> MV, shared_ptr<Program> prog, Vector3f pos, float alpha, bool center) 
+void FaceCentered::draw(shared_ptr<MatrixStack> MV, shared_ptr<Program> prog, Vector3f pos, float alpha, bool center, Vector3d ndx) 
 {
     if (center && alpha < 1.0) { 
         glUniform1f(prog->getUniform("alpha"), 1.0);

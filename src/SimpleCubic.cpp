@@ -21,7 +21,7 @@ SimpleCubic::~SimpleCubic()
 {
 }
 
-void SimpleCubic::draw(shared_ptr<MatrixStack> MV, shared_ptr<Program> prog, Vector3f pos, float alpha, bool center) 
+void SimpleCubic::draw(shared_ptr<MatrixStack> MV, shared_ptr<Program> prog, Vector3f pos, float alpha, bool center, Vector3d ndx) 
 {
     if (center && alpha < 1.0) {
         glUniform1f(prog->getUniform("alpha"), 1.0);
@@ -32,27 +32,38 @@ void SimpleCubic::draw(shared_ptr<MatrixStack> MV, shared_ptr<Program> prog, Vec
     
     MV->pushMatrix();
     MV->translate(pos);
-
-    MV->pushMatrix();
     
-    drawEighth(MV, prog, 0);
-    drawEighth(MV, prog, 90);
-    drawEighth(MV, prog, 180);
-    drawEighth(MV, prog, 270);
+    if (ndx(1) != UnitCell::MIN) {
+        
+        if (ndx(2) != UnitCell::MIN) {
+            
+            if (ndx(0) != UnitCell::MAX) { drawEighth(MV, prog, 0); }
+            if (ndx(0) != UnitCell::MIN) { drawEighth(MV, prog, 90); }
+        }
+       
+        if (ndx(2) != UnitCell::MAX) {
+            if (ndx(0) != UnitCell::MIN) { drawEighth(MV, prog, 180); }
+            if (ndx(0) != UnitCell::MAX) { drawEighth(MV, prog, 270); }
+        }
+    }
     
-    MV->pushMatrix();
-    MV->rotate(90.0f, Vector3f(1.0, 0.0, 0.0));
-  
-    drawEighth(MV, prog, 0);
-    drawEighth(MV, prog, 90);
+    if (ndx(1) != UnitCell::MAX) {
+        MV->pushMatrix();
+        MV->rotate(90.0f, Vector3f(1.0, 0.0, 0.0));
+        if (ndx(2) != UnitCell::MIN) {
+            if (ndx(0) != UnitCell::MAX) { drawEighth(MV, prog, 0); }
+            if (ndx(0) != UnitCell::MIN) { drawEighth(MV, prog, 90); }
+        }
     
-    MV->rotate(180.0f, Vector3f(1.0, 0.0, 0.0));
-    drawEighth(MV, prog, 180);
-    drawEighth(MV, prog, 270);
+        MV->rotate(180.0f, Vector3f(1.0, 0.0, 0.0));
+        if (ndx(2) != UnitCell::MAX) {
+            if (ndx(0) != UnitCell::MIN) { drawEighth(MV, prog, 180); }
+            if (ndx(0) != UnitCell::MAX) { drawEighth(MV, prog, 270); }
+        }
     
-    MV->popMatrix();
+        MV->popMatrix();
+    }
     
-    MV->popMatrix();
     MV->popMatrix();
 
     glUniform1f(prog->getUniform("alpha"), alpha); // Make sure alpha is same as it was 

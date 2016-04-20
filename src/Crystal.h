@@ -38,7 +38,7 @@ private:
     float calcCellDistance(Eigen::Matrix4f m, Eigen::Vector4f v);
     void sortCells(Eigen::Matrix4f viewMatrix);
     
-    static bool sortAlg(std::pair<float, Eigen::Vector4f> i, std::pair<float, Eigen::Vector4f> j)
+    static bool sortAlg(std::pair<float, std::pair<Eigen::Vector3d, Eigen::Vector4f> > i, std::pair<float, std::pair<Eigen::Vector3d, Eigen::Vector4f> > j)
     {
         return i.first > j.first;
     }
@@ -56,7 +56,7 @@ private:
     std::shared_ptr<Shape> half;
     std::shared_ptr<Shape> sphere;
     std::map<std::string, Eigen::Vector3f> colors;
-    std::vector<std::pair<float, Eigen::Vector4f> > cells;
+    std::vector<std::pair<float, std::pair<Eigen::Vector3d, Eigen::Vector4f> > > cells;
 };
 
 #endif
