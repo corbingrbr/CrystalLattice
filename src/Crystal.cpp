@@ -140,10 +140,23 @@ void Crystal::initCellPositions()
 
                     if (i == 0) { x = UnitCell::MIN; }
                     if (i == rows-1) { x = UnitCell::MAX; }
+                    if (i == rows-2) { x = UnitCell::ONEB4MAX; }
+
+                    if (i == 1) { x = UnitCell::ONEB4MIN; }
+                    
                     if (j == 0) { y = UnitCell::MIN; }
                     if (j == cols-1) { y = UnitCell::MAX; }
+
+                    if (j == cols-2) { y = UnitCell::ONEB4MAX; }
+
+                    if (j == 1) { y = UnitCell::ONEB4MIN; }
+
+
                     if (k == 0) { z = UnitCell::MIN; }
                     if (k == height-1) { z = UnitCell::MAX; }
+                    if (k == height-2) { z = UnitCell::ONEB4MAX; }
+
+                    if (k == 1) { z = UnitCell::ONEB4MIN; }
 
 
                     Vector3d ndx(y, z, x);

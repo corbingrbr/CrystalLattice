@@ -29,11 +29,11 @@ void BodyCentered::draw(shared_ptr<MatrixStack> MV, shared_ptr<Program> prog, Ve
         glUniform1f(prog->getUniform("alpha"), 1.0);
      } 
 
-     if (center || alpha == 1.0) {
+     //if (center || alpha == 1.0) {
          glUniform3fv(prog->getUniform("kdFront"), 1, colors["red"].data());
-     } else {
-         glUniform3fv(prog->getUniform("kdFront"), 1, colors["grey"].data());
-     }
+         //} else {
+         //glUniform3fv(prog->getUniform("kdFront"), 1, colors["grey"].data());
+         //}
      
      MV->pushMatrix();
      MV->translate(pos);

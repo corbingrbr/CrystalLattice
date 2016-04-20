@@ -36,35 +36,74 @@ void FaceCentered::draw(shared_ptr<MatrixStack> MV, shared_ptr<Program> prog, Ve
     MV->pushMatrix();
     MV->translate(pos);
      
-    MV->pushMatrix();
-     
-    drawHalf(MV, prog, 0, Vector3f(0, 1.0, 0));
-    drawHalf(MV, prog, 90, Vector3f(0, 1.0, 0));
-    drawHalf(MV, prog, 180, Vector3f(0, 1.0, 0));
-    drawHalf(MV, prog, 270, Vector3f(0, 1.0, 0));
-    drawHalf(MV, prog, -90, Vector3f(0, 0, 1.0));
-    drawHalf(MV, prog, 90, Vector3f(0, 0, 1.0));
+    if (ndx(0) >= UnitCell::ONEB4MIN && ndx(0) <= UnitCell::MAX && // left right
+        ndx(1) >= UnitCell::ONEB4MIN && ndx(1) < UnitCell::MAX && // height
+        ndx(2) >= UnitCell::ONEB4MIN && ndx(2) < UnitCell::MAX) {  // depth
+        drawHalf(MV, prog, 0, Vector3f(0, 1.0, 0)); 
+    }
+    // Diff color maybe
+    if (ndx(0) >= UnitCell::ONEB4MIN && ndx(0) < UnitCell::MAX && // left right
+        ndx(1) >= UnitCell::ONEB4MIN && ndx(1) < UnitCell::MAX && // height
+        ndx(2) >= UnitCell::MIN && ndx(2) < UnitCell::MAX) { // depth
+        drawHalf(MV, prog, 90, Vector3f(0, 1.0, 0));
+    }
+
+    if (ndx(0) >= UnitCell::MIN && ndx(0) < UnitCell::MAX && // left right
+        ndx(1) >= UnitCell::ONEB4MIN && ndx(1) < UnitCell::MAX && // height
+        ndx(2) >= UnitCell::ONEB4MIN && ndx(2) < UnitCell::MAX) { // depth
+        drawHalf(MV, prog, 180, Vector3f(0, 1.0, 0));
+    }
+
+    if (ndx(0) >= UnitCell::ONEB4MIN && ndx(0) < UnitCell::MAX && // left right
+        ndx(1) >= UnitCell::ONEB4MIN && ndx(1) < UnitCell::MAX && // height
+        ndx(2) >= UnitCell::ONEB4MIN && ndx(2) <= UnitCell::MAX) { 
+        drawHalf(MV, prog, 270, Vector3f(0, 1.0, 0));
+    }
+
+    if (ndx(0) >= UnitCell::ONEB4MIN && ndx(0) < UnitCell::MAX && // left right
+        ndx(1) >= UnitCell::MIN && ndx(1) < UnitCell::MAX && // height
+        ndx(2) >= UnitCell::ONEB4MIN && ndx(2) < UnitCell::MAX) { 
+        drawHalf(MV, prog, -90, Vector3f(0, 0, 1.0));
+    }
+
+    if (ndx(0) >= UnitCell::ONEB4MIN && ndx(0) < UnitCell::MAX && // left right
+        ndx(1) >= UnitCell::ONEB4MIN && ndx(1) <= UnitCell::MAX && // height
+        ndx(2) >= UnitCell::ONEB4MIN && ndx(2) < UnitCell::MAX) { 
+        drawHalf(MV, prog, 90, Vector3f(0, 0, 1.0));
+    }
 
     glUniform3fv(prog->getUniform("kdFront"), 1, colors["grey"].data());
 
-    drawEighth(MV, prog, 0);
-    drawEighth(MV, prog, 90);
-    drawEighth(MV, prog, 180);
-    drawEighth(MV, prog, 270);
+    if (ndx(1) != UnitCell::MIN) {
+        
+        if (ndx(2) != UnitCell::MIN) {
+            
+            if (ndx(0) != UnitCell::MAX) { drawEighth(MV, prog, 0); }
+            if (ndx(0) != UnitCell::MIN) { drawEighth(MV, prog, 90); }
+        }
+       
+        if (ndx(2) != UnitCell::MAX) {
+            if (ndx(0) != UnitCell::MIN) { drawEighth(MV, prog, 180); }
+            if (ndx(0) != UnitCell::MAX) { drawEighth(MV, prog, 270); }
+        }
+    }
     
-    MV->pushMatrix();
-    MV->rotate(90.0f, Vector3f(1.0, 0.0, 0.0));
-  
-    drawEighth(MV, prog, 0);
-    drawEighth(MV, prog, 90);
-    
-    MV->rotate(180.0f, Vector3f(1.0, 0.0, 0.0));
-    drawEighth(MV, prog, 180);
-    drawEighth(MV, prog, 270);
-    
-    MV->popMatrix();
-    
-    MV->popMatrix();
+    if (ndx(1) != UnitCell::MAX) {
+        MV->pushMatrix();
+        MV->rotate(90.0f, Vector3f(1.0, 0.0, 0.0));
+        if (ndx(2) != UnitCell::MIN) {
+            if (ndx(0) != UnitCell::MAX) { drawEighth(MV, prog, 0); }
+            if (ndx(0) != UnitCell::MIN) { drawEighth(MV, prog, 90); }
+        }
+        
+        MV->rotate(180.0f, Vector3f(1.0, 0.0, 0.0));
+        if (ndx(2) != UnitCell::MAX) {
+            if (ndx(0) != UnitCell::MIN) { drawEighth(MV, prog, 180); }
+            if (ndx(0) != UnitCell::MAX) { drawEighth(MV, prog, 270); }
+        }
+        MV->popMatrix();
+    }
+
     MV->popMatrix();
 
     glUniform1f(prog->getUniform("alpha"), alpha); // Make sure alpha is same as it was 
