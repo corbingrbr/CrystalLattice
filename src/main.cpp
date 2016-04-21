@@ -53,13 +53,11 @@ static void char_callback(GLFWwindow *window, unsigned int key)
         break;
     case 'c': scene->contract();
         break;
-    case 'y': scene->scaleDown();
-        break;
-    case 'u': scene->scaleUp();
-        break;
     case 't': scene->toggleTranslucency();
         break;
     case 'n': scene->nextCrystal();
+        break;
+    case 'l': scene->toggleLayers();
         break;
 	}
 }

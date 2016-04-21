@@ -46,6 +46,9 @@ void Scene::load(const string &RESOURCE_DIR)
 void Scene::nextCrystal()
 {
     whichCrystal = (whichCrystal + 1) % crystals.size();
+
+    // Make sure it starts as falling layers
+    crystals[whichCrystal]->setDrawLayers();
 }
 
 
@@ -73,23 +76,16 @@ void Scene::contract()
      }
 }
 
-void Scene::scaleUp()
-{
-    for (unsigned int i = 0; i < crystals.size(); i++) {
-         crystals[i]->scaleUp();
-    }
-}
-
-void Scene::scaleDown()
-{
-    for (unsigned int i = 0; i < crystals.size(); i++) {
-         crystals[i]->scaleDown();
-    }
-}
-
 void Scene::toggleTranslucency()
 {
     for (unsigned int i = 0; i < crystals.size(); i++) {
          crystals[i]->toggleTranslucency();
+    }
+}
+
+void Scene::toggleLayers()
+{
+    for (unsigned int i = 0; i < crystals.size(); i++) {
+         crystals[i]->toggleLayers();
     }
 }

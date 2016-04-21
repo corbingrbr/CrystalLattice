@@ -1,29 +1,39 @@
-#ifndef _LAYER_H
-#define _LAYER_H
+#ifndef _LAYER_H_
+#define _LAYER_H_
 
 #include <memory>
+#include <Eigen/Dense>
 
-class UnitCell;
+class Shape;
 class MatrixStack;
 class Program;
 
-class Layer
+class Layer 
 {
+
 public:
 
-    Layer(int width, int length, float height, std::shared_ptr<UnitCell> unitCell);
+    Layer(int rows, int cols, float restHeight, float expansion, Eigen::Vector3f color, std::shared_ptr<Shape> sphere);
     virtual ~Layer();
-    void init();
-    void draw(std::shared_ptr<MatrixStack> MV, const std::shared_ptr<Program> prog);
+    void reset();
+    void update();
+    void draw(std::shared_ptr<MatrixStack> MV, std::shared_ptr<Program> prog);
+    bool isAtRest();
     
 
 private:
-    
-    std::shared_ptr<UnitCell> unitCell;
-    int width;
-    int length;
-    float height;
-
+    int rows;
+    int cols;
+    float startHeight;
+    float restHeight;
+    float expansion;
+    float curHeight;
+    float speed;
+    bool atRest;
+    Eigen::Vector3f color;
+    Eigen::Vector3f offset;
+    std::shared_ptr<Shape> sphere;
 };
 
 #endif
+

@@ -1,32 +1,71 @@
 #include "Layer.h"
 
-#include "UnitCell.h"
-#include "SimpleCubic.h"
-//#include "BodyCentered.h"
-//#include "FaceCentered.h"
+#include "Shape.h"
+#include "MatrixStack.h"
+#include "Program.h"
+#include <Eigen/Dense>
 
+using namespace Eigen;
 using namespace std;
 
-Layer::Layer(int width, int length, float height, shared_ptr<UnitCell> unitCell) 
+Layer::Layer(int rows, int cols, float restHeight, float expansion, Vector3f color, shared_ptr<Shape> sphere) 
+    : rows(rows),
+      cols(cols),
+      startHeight(7.0),
+      restHeight(restHeight),
+      expansion(expansion),
+      curHeight(7.0),
+      speed(.05),
+      atRest(false),
+      color(color),
+      sphere(sphere)
 {
-    this->unitCell = unitCell;
-    this->width = width;
-    this->length = length;
-    this->height = height;
-}
+  
+    offset = Vector3f(-(cols-1)*expansion, restHeight,-(rows-1)*expansion);
+ 
+} 
 
 Layer::~Layer()
 {
 }
 
-void Layer::init()
+void Layer::reset()
 {
-    // Create Layer crystalline according to type
-    
-    
+    curHeight = startHeight;
+    atRest = false;
+}
+
+void Layer::update()
+{
+    if (curHeight - speed > restHeight) {
+        curHeight -= speed;
+    } else {
+        curHeight = restHeight;
+        atRest = true;
+    }
 }
 
 void Layer::draw(shared_ptr<MatrixStack> MV, const shared_ptr<Program> prog)
 {
+    glUniform1f(prog->getUniform("alpha"), 1.0);
+    glUniform3fv(prog->getUniform("kdFront"), 1, color.data());
     
+
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < cols; j++) {
+
+            Vector3f pos(offset(0) + j*2*expansion, curHeight*expansion, offset(2) + i*2*expansion);
+            
+            MV->pushMatrix();
+            MV->translate(pos);
+            glUniformMatrix4fv(prog->getUniform("MV"), 1, GL_FALSE, MV->topMatrix().data());
+            sphere->draw(prog);
+            MV->popMatrix();
+        }
+    }
+}
+
+bool Layer::isAtRest()
+{
+    return atRest;
 }

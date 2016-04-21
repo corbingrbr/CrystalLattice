@@ -13,6 +13,7 @@ class MatrixStack;
 class Program;
 class UnitCell;
 class Shape;
+class Layer;
 
 class Crystal
 {
@@ -26,11 +27,15 @@ public:
     virtual ~Crystal();
     void init();
     void draw(std::shared_ptr<MatrixStack> MV, const std::shared_ptr<Program> prog);
+    void drawCells(std::shared_ptr<MatrixStack> MV, const std::shared_ptr<Program> prog);
+    void drawLayers(std::shared_ptr<MatrixStack> MV, const std::shared_ptr<Program> prog);
     void expand();
     void contract();
     void scaleDown();
     void scaleUp();
     void toggleTranslucency();
+    void setDrawLayers();
+    void toggleLayers();
 
 private:
     
@@ -43,6 +48,10 @@ private:
         return i.first > j.first;
     }
 
+    void createSimpleLayers();
+    void createBodyLayers();
+    void createFaceLayers();
+
     int type;
     int rows;
     int cols;
@@ -50,6 +59,7 @@ private:
     float scale;
     float expansion;
     bool translucent;
+    bool layersDraw;
 
     std::shared_ptr<UnitCell> unit;
     std::shared_ptr<Shape> eighth;
@@ -57,6 +67,7 @@ private:
     std::shared_ptr<Shape> sphere;
     std::map<std::string, Eigen::Vector3f> colors;
     std::vector<std::pair<float, std::pair<Eigen::Vector3d, Eigen::Vector4f> > > cells;
+    std::vector<std::shared_ptr<Layer> > layers;
 };
 
 #endif

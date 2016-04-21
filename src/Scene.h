@@ -29,9 +29,8 @@ public:
     void draw(std::shared_ptr<MatrixStack> MV, const std::shared_ptr<Program> prog);
     void expand();
     void contract();
-    void scaleUp();
-    void scaleDown();
     void toggleTranslucency();
+    void toggleLayers();
 
 private:
     

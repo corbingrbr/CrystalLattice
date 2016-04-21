@@ -29,11 +29,11 @@ void BodyCentered::draw(shared_ptr<MatrixStack> MV, shared_ptr<Program> prog, Ve
         glUniform1f(prog->getUniform("alpha"), 1.0);
      } 
 
-     //if (center || alpha == 1.0) {
+     if (center || alpha == 1.0) {
          glUniform3fv(prog->getUniform("kdFront"), 1, colors["red"].data());
-         //} else {
-         //glUniform3fv(prog->getUniform("kdFront"), 1, colors["grey"].data());
-         //}
+     } else {
+         glUniform3fv(prog->getUniform("kdFront"), 1, colors["grey"].data());
+     }
      
      MV->pushMatrix();
      MV->translate(pos);
@@ -81,30 +81,10 @@ void BodyCentered::draw(shared_ptr<MatrixStack> MV, shared_ptr<Program> prog, Ve
     
         MV->popMatrix();
     }
-     
-     /*// Draw eighths
-     MV->pushMatrix();
     
-     drawEighth(MV, prog, 0);
-     drawEighth(MV, prog, 90);
-     drawEighth(MV, prog, 180);
-     drawEighth(MV, prog, 270);
-    
-     MV->pushMatrix();
-     MV->rotate(90.0f, Vector3f(1.0, 0.0, 0.0));
-  
-     drawEighth(MV, prog, 0);
-     drawEighth(MV, prog, 90);
-    
-     MV->rotate(180.0f, Vector3f(1.0, 0.0, 0.0));
-     drawEighth(MV, prog, 180);
-     drawEighth(MV, prog, 270);
-    
-     MV->popMatrix();*/
-    
-     MV->popMatrix();
+    MV->popMatrix();
 
-     glUniform1f(prog->getUniform("alpha"), alpha); // Make sure alpha is same as it was 
+    glUniform1f(prog->getUniform("alpha"), alpha); // Make sure alpha is same as it was 
 }
 
 void BodyCentered::drawEighth(shared_ptr<MatrixStack> MV, shared_ptr<Program> prog, float rot) {

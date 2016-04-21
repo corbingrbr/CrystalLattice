@@ -9,6 +9,7 @@
 #include "BodyCentered.h"
 #include "FaceCentered.h"
 #include "Shape.h"
+#include "Layer.h"
 
 #include <Eigen/Dense>
 #include <utility>
@@ -29,6 +30,7 @@ Crystal::Crystal(int type, shared_ptr<Shape> eighth, shared_ptr<Shape> half, sha
     this->cols = 5;
     this->height = 5; 
     this->scale = .1;
+    this->layersDraw = true;
 }
 
 Crystal::~Crystal()
@@ -51,21 +53,32 @@ void Crystal::init()
         
     case SIMPLE:
         unit = make_shared<SimpleCubic>(eighth, half, sphere, colors);
+        createSimpleLayers();
         break;
     case BODY:
         unit = make_shared<BodyCentered>(eighth, half, sphere, colors);
+        createBodyLayers();
         break;
     case FACE:
         unit = make_shared<FaceCentered>(eighth, half, sphere, colors);
+        createFaceLayers();
         break;
     
-    }
-    
+    } 
 }
 
 void Crystal::draw(shared_ptr<MatrixStack> MV, const shared_ptr<Program> prog)
 {
-    
+    if (layersDraw) {
+        drawLayers(MV, prog);
+    } else {
+        drawCells(MV, prog);
+    }
+   
+}
+
+void Crystal::drawCells(shared_ptr<MatrixStack> MV, const shared_ptr<Program> prog)
+{
     sortCells(MV->topMatrix());
 
     float alpha = translucent ? 0.3 : 1.0;
@@ -85,6 +98,35 @@ void Crystal::draw(shared_ptr<MatrixStack> MV, const shared_ptr<Program> prog)
         unit->draw(MV, prog, v, alpha, false, ndx); // Draw cell
     }
 
+    MV->popMatrix();
+}
+
+void Crystal::drawLayers(shared_ptr<MatrixStack> MV, const std::shared_ptr<Program> prog)
+{
+    MV->pushMatrix();
+    MV->scale(scale);
+    
+    if (type == BODY) {
+        MV->scale(0.87);
+    } else if (type == FACE) {
+        MV->scale(0.71);
+    }
+    
+    for (unsigned int i = 0; i < layers.size(); i++) {
+        layers[i]->draw(MV, prog);
+        
+        // If layer still has more to fall, drop layer further and exit loop
+        if (!layers[i]->isAtRest()) {
+            layers[i]->update();
+            break;
+        }
+
+        // If last layer has fallen and settled, switch to other model for separation effects
+        if (i == layers.size() - 1 && layers[i]->isAtRest()) {
+            toggleLayers();
+        }
+    }
+    
     MV->popMatrix();
 }
 
@@ -111,6 +153,23 @@ void Crystal::scaleDown()
 void Crystal::toggleTranslucency()
 {
     translucent = !translucent;
+}
+
+void Crystal::setDrawLayers()
+{
+    layersDraw = true;
+}
+
+void Crystal::toggleLayers()
+{
+    layersDraw = !layersDraw;
+    
+    for (unsigned int i = 0; i < layers.size(); i++) {
+        layers[i]->reset();
+    }
+
+    expansion = 1.0;
+    translucent = false;
 }
 
 float Crystal::calcCellDistance(Matrix4f m, Vector4f v)
@@ -178,4 +237,47 @@ void Crystal::sortCells(Matrix4f viewMatrix)
     
     // Sort cells in descending order by distance from camera
     sort(cells.begin(), cells.end(), sortAlg);
+}
+
+void Crystal::createSimpleLayers()
+{
+    layers.push_back(make_shared<Layer>(4,4, -3, 1.0, colors["grey"], sphere));
+    layers.push_back(make_shared<Layer>(4,4, -1, 1.0, colors["grey"], sphere));
+    layers.push_back(make_shared<Layer>(4,4, 1, 1.0, colors["grey"], sphere));
+    layers.push_back(make_shared<Layer>(4,4, 3, 1.0, colors["grey"], sphere));
+}
+
+void Crystal::createBodyLayers()
+{
+    layers.push_back(make_shared<Layer>(4,4, -3, 1.14942, colors["grey"], sphere));
+    layers.push_back(make_shared<Layer>(3,3, -2, 1.14942, colors["red"], sphere));
+    layers.push_back(make_shared<Layer>(4,4, -1, 1.14942, colors["grey"], sphere));
+    layers.push_back(make_shared<Layer>(3,3, 0, 1.14942, colors["red"], sphere));
+    layers.push_back(make_shared<Layer>(4,4, 1, 1.14942, colors["grey"], sphere));
+    layers.push_back(make_shared<Layer>(3,3, 2, 1.14942, colors["red"], sphere));
+    layers.push_back(make_shared<Layer>(4,4, 3, 1.14942, colors["grey"], sphere));
+}
+
+void Crystal::createFaceLayers()
+{
+    layers.push_back(make_shared<Layer>(3,3, -3, 1.40845, colors["green"], sphere));
+    layers.push_back(make_shared<Layer>(4,4, -3, 1.40845, colors["grey"], sphere));
+
+    layers.push_back(make_shared<Layer>(4,3, -2, 1.40845, colors["green"], sphere));
+    layers.push_back(make_shared<Layer>(3,4, -2, 1.40845, colors["green"], sphere));
+
+    layers.push_back(make_shared<Layer>(4,4, -1, 1.40845, colors["grey"], sphere));
+    layers.push_back(make_shared<Layer>(3,3, -1, 1.40845, colors["green"], sphere));
+    
+    layers.push_back(make_shared<Layer>(4,3, 0, 1.40845, colors["green"], sphere));
+    layers.push_back(make_shared<Layer>(3,4, 0, 1.40845, colors["green"], sphere));
+    
+    layers.push_back(make_shared<Layer>(4,4, 1, 1.40845, colors["grey"], sphere));
+    layers.push_back(make_shared<Layer>(3,3, 1, 1.40845, colors["green"], sphere));
+
+    layers.push_back(make_shared<Layer>(4,3, 2, 1.40845, colors["green"], sphere));
+    layers.push_back(make_shared<Layer>(3,4, 2, 1.40845, colors["green"], sphere));
+    
+    layers.push_back(make_shared<Layer>(4,4, 3, 1.40845, colors["grey"], sphere));
+    layers.push_back(make_shared<Layer>(3,3, 3, 1.40845, colors["green"], sphere));
 }
