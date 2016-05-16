@@ -27,18 +27,19 @@ public:
     virtual ~Crystal();
     void init();
     void draw(std::shared_ptr<MatrixStack> MV, const std::shared_ptr<Program> prog);
-    void drawCells(std::shared_ptr<MatrixStack> MV, const std::shared_ptr<Program> prog);
-    void drawLayers(std::shared_ptr<MatrixStack> MV, const std::shared_ptr<Program> prog);
     void expand();
     void contract();
-    void scaleDown();
-    void scaleUp();
     void toggleTranslucency();
     void setDrawLayers();
     void toggleLayers();
+    void toggleInspection();
 
 private:
-    
+
+     void drawCells(std::shared_ptr<MatrixStack> MV, const std::shared_ptr<Program> prog);
+    void drawLayers(std::shared_ptr<MatrixStack> MV, const std::shared_ptr<Program> prog);
+    void drawInspect(std::shared_ptr<MatrixStack> MV, const std::shared_ptr<Program> prog);
+
     void initCellPositions();
     float calcCellDistance(Eigen::Matrix4f m, Eigen::Vector4f v);
     void sortCells(Eigen::Matrix4f viewMatrix);
@@ -52,14 +53,23 @@ private:
     void createBodyLayers();
     void createFaceLayers();
 
+    void drawSimpleInspect(std::shared_ptr<MatrixStack> MV, const std::shared_ptr<Program> prog);
+    void drawBodyInspect(std::shared_ptr<MatrixStack> MV, const std::shared_ptr<Program> prog);
+    void drawFaceInspect(std::shared_ptr<MatrixStack> MV, const std::shared_ptr<Program> prog);
+    void drawEighth(std::shared_ptr<MatrixStack> MV, std::shared_ptr<Program> prog, float rot);
+    
+
     int type;
     int rows;
     int cols;
     int height;
     float scale;
     float expansion;
+    float inspctExp;
     bool translucent;
     bool layersDraw;
+    bool inspecting;
+
 
     std::shared_ptr<UnitCell> unit;
     std::shared_ptr<Shape> eighth;

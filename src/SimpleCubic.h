@@ -20,9 +20,6 @@ public:
     virtual ~SimpleCubic();
     void draw(std::shared_ptr<MatrixStack> MV, std::shared_ptr<Program> prog, Eigen::Vector3f pos, float alpha, bool center, Eigen::Vector3d ndx);
     
-    void scaleUp();
-    void scaleDown();
-    
 private:
     void drawEighth(std::shared_ptr<MatrixStack> MV, std::shared_ptr<Program> prog, float rot);
     

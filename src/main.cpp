@@ -59,6 +59,8 @@ static void char_callback(GLFWwindow *window, unsigned int key)
         break;
     case 'l': scene->toggleLayers();
         break;
+        //case 'i': scene->toggleInspection();
+        //break;
 	}
 }
 
@@ -113,7 +115,6 @@ static void init()
 	prog->addUniform("P");
 	prog->addUniform("MV");
 	prog->addUniform("kdFront");
-	//prog->addUniform("kdBack");
     prog->addUniform("alpha");
 	prog->addAttribute("vertPos");
 	prog->addAttribute("vertNor");
@@ -233,6 +234,8 @@ int main(int argc, char **argv)
 		return 0;
 	}
 	
+    cout << glGetString(GL_SHADING_LANGUAGE_VERSION) << endl;
+
     RESOURCE_DIR = argv[1] + string("/");
 	
 	// Set error callback.

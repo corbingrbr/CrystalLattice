@@ -99,14 +99,3 @@ void BodyCentered::drawEighth(shared_ptr<MatrixStack> MV, shared_ptr<Program> pr
     
     MV->popMatrix();
 }
-
-void BodyCentered::scaleUp()
-{
-
-    if (scale > 0.5) { scale -= .01; }
-}
-
-void BodyCentered::scaleDown()
-{
-    if (scale < 1.0) { scale += .01; }
-}

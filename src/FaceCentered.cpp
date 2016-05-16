@@ -109,16 +109,6 @@ void FaceCentered::draw(shared_ptr<MatrixStack> MV, shared_ptr<Program> prog, Ve
     glUniform1f(prog->getUniform("alpha"), alpha); // Make sure alpha is same as it was 
 }
 
-void FaceCentered::scaleUp()
-{
-    if (scale > 0.5) { scale -= .01; }
-}
-
-void FaceCentered::scaleDown()
-{
-    if (scale < 1.0) { scale += .01; }
-}
-
 void FaceCentered::drawEighth(shared_ptr<MatrixStack> MV, shared_ptr<Program> prog, float rot) {
     
     MV->pushMatrix();

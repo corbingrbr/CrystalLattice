@@ -31,6 +31,7 @@ public:
     void contract();
     void toggleTranslucency();
     void toggleLayers();
+    void toggleInspection();
 
 private:
     

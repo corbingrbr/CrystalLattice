@@ -81,13 +81,3 @@ void SimpleCubic::drawEighth(shared_ptr<MatrixStack> MV, shared_ptr<Program> pro
     
     MV->popMatrix();
 }
-
-void SimpleCubic::scaleUp()
-{
-    if (scale > 0.5) { scale -= .01; }
-}
-
-void SimpleCubic::scaleDown()
-{
-    if (scale < 1.0) { scale += .01; }
-} 

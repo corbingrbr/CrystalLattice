@@ -89,3 +89,10 @@ void Scene::toggleLayers()
          crystals[i]->toggleLayers();
     }
 }
+
+void Scene::toggleInspection()
+{
+    for (unsigned int i = 0; i < crystals.size(); i++) {
+         crystals[i]->toggleInspection();
+    }
+}

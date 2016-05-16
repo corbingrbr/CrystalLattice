@@ -19,18 +19,21 @@ using namespace std;
 using namespace Eigen;
 
 Crystal::Crystal(int type, shared_ptr<Shape> eighth, shared_ptr<Shape> half, shared_ptr<Shape> sphere) :
+
+    type(type),
+    rows(5),
+    cols(5),
+    height(5),
+    scale(.1),
     expansion(1.0),
-    translucent(false)
+    inspctExp(0),
+    translucent(false),
+    layersDraw(true),
+    inspecting(false),
+    eighth(eighth),
+    half(half),
+    sphere(sphere)
 {
-    this->type = type;
-    this->eighth = eighth;
-    this->half = half;
-    this->sphere = sphere;
-    this->rows = 5; // only works with odd atm
-    this->cols = 5;
-    this->height = 5; 
-    this->scale = .1;
-    this->layersDraw = true;
 }
 
 Crystal::~Crystal()
@@ -71,6 +74,8 @@ void Crystal::draw(shared_ptr<MatrixStack> MV, const shared_ptr<Program> prog)
 {
     if (layersDraw) {
         drawLayers(MV, prog);
+    } else if (inspecting) {
+        drawInspect(MV, prog);
     } else {
         drawCells(MV, prog);
     }
@@ -130,24 +135,37 @@ void Crystal::drawLayers(shared_ptr<MatrixStack> MV, const std::shared_ptr<Progr
     MV->popMatrix();
 }
 
+void Crystal::drawInspect(shared_ptr<MatrixStack> MV, const std::shared_ptr<Program> prog)
+{
+    switch (type) {
+    case SIMPLE:
+        drawSimpleInspect(MV, prog);
+        break;
+    case BODY:
+        drawBodyInspect(MV, prog);
+        break;
+    case FACE:
+        drawFaceInspect(MV, prog);
+        break;
+    }
+}
+
 void Crystal::expand()
 {
-    if (expansion < 4.0) { expansion += .2; }
+    if (inspecting) {
+        if (inspctExp < .4) { inspctExp += .1; }
+    } else {
+        if (expansion < 4.0) { expansion += .2; }
+    }
 }
 
 void Crystal::contract()
 {
-    if (expansion > 1.0) { expansion -= .2; }
-}
-
-void Crystal::scaleUp()
-{
-    unit->scaleUp();
-}
-
-void Crystal::scaleDown()
-{
-    unit->scaleDown();
+    if (inspecting) {
+        if (inspctExp > 0) { inspctExp -= .1; }
+    } else {
+        if (expansion > 1.0) { expansion -= .2; }
+    }
 }
 
 void Crystal::toggleTranslucency()
@@ -169,7 +187,15 @@ void Crystal::toggleLayers()
     }
 
     expansion = 1.0;
+    inspctExp = 1.0;
     translucent = false;
+}
+
+void Crystal::toggleInspection()
+{
+    if (layersDraw) { toggleLayers(); }
+    
+    inspecting = !inspecting;
 }
 
 float Crystal::calcCellDistance(Matrix4f m, Vector4f v)
@@ -260,8 +286,8 @@ void Crystal::createBodyLayers()
 
 void Crystal::createFaceLayers()
 {
-    layers.push_back(make_shared<Layer>(3,3, -3, 1.40845, colors["green"], sphere));
     layers.push_back(make_shared<Layer>(4,4, -3, 1.40845, colors["grey"], sphere));
+    layers.push_back(make_shared<Layer>(3,3, -3, 1.40845, colors["green"], sphere));
 
     layers.push_back(make_shared<Layer>(4,3, -2, 1.40845, colors["green"], sphere));
     layers.push_back(make_shared<Layer>(3,4, -2, 1.40845, colors["green"], sphere));
@@ -281,3 +307,51 @@ void Crystal::createFaceLayers()
     layers.push_back(make_shared<Layer>(4,4, 3, 1.40845, colors["grey"], sphere));
     layers.push_back(make_shared<Layer>(3,3, 3, 1.40845, colors["green"], sphere));
 }
+
+void Crystal:: drawSimpleInspect(shared_ptr<MatrixStack> MV, const std::shared_ptr<Program> prog)
+{
+   
+    glUniform1f(prog->getUniform("alpha"), 1.0);
+    glUniform3fv(prog->getUniform("kdFront"), 1, colors["blue"].data());
+    
+    MV->pushMatrix();
+    
+    drawEighth(MV, prog, 0); 
+    drawEighth(MV, prog, 90); 
+    drawEighth(MV, prog, 180); 
+    drawEighth(MV, prog, 270); 
+    
+    MV->pushMatrix();
+    MV->rotate(90.0f, Vector3f(1.0, 0.0, 0.0));
+    drawEighth(MV, prog, 0); 
+    drawEighth(MV, prog, 90); 
+    
+    MV->rotate(180.0f, Vector3f(1.0, 0.0, 0.0));
+
+    drawEighth(MV, prog, 180); 
+    drawEighth(MV, prog, 270); 
+    
+    MV->popMatrix();
+    
+    MV->popMatrix();
+}
+
+void Crystal::drawBodyInspect(shared_ptr<MatrixStack> MV, const shared_ptr<Program> prog)
+{
+}
+
+void Crystal::drawFaceInspect(shared_ptr<MatrixStack> MV, const shared_ptr<Program> prog)
+{
+}
+
+void Crystal::drawEighth(shared_ptr<MatrixStack> MV, shared_ptr<Program> prog, float rot) {
+    
+    MV->pushMatrix();
+    MV->rotate(rot, Vector3f(0.0, 1.0, 0.0));
+    MV->scale(scale);
+    glUniformMatrix4fv(prog->getUniform("MV"), 1, GL_FALSE, MV->topMatrix().data());
+    eighth->draw(prog);
+    
+    MV->popMatrix();
+}
+
