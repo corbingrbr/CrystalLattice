@@ -13,16 +13,32 @@ Layer::Layer(int rows, int cols, float restHeight, float expansion, Vector3f col
       cols(cols),
       startHeight(7.0),
       restHeight(restHeight),
-      expansion(expansion),
+      xexpansion(expansion),
+      zexpansion(expansion),
+      curHeight(7.0),
+      speed(.05),
+      atRest(false),
+      color(color),
+      sphere(sphere)
+{ 
+    offset = Vector3f(-(cols-1)*expansion, restHeight,-(rows-1)*expansion);
+}
+
+Layer::Layer(int rows, int cols, float restHeight, float xexpansion, float zexpansion, Vector3f color, shared_ptr<Shape> sphere) 
+    : rows(rows),
+      cols(cols),
+      startHeight(7.0),
+      restHeight(restHeight),
+      xexpansion(xexpansion),
+      zexpansion(zexpansion),
       curHeight(7.0),
       speed(.05),
       atRest(false),
       color(color),
       sphere(sphere)
 {
-  
-    offset = Vector3f(-(cols-1)*expansion, restHeight,-(rows-1)*expansion);
- 
+    offset = Vector3f(-(cols-1)*xexpansion, restHeight,-(rows-1)*zexpansion);
+    
 } 
 
 Layer::~Layer()
@@ -54,7 +70,7 @@ void Layer::draw(shared_ptr<MatrixStack> MV, const shared_ptr<Program> prog)
     for (int i = 0; i < rows; i++) {
         for (int j = 0; j < cols; j++) {
 
-            Vector3f pos(offset(0) + j*2*expansion, curHeight*expansion, offset(2) + i*2*expansion);
+            Vector3f pos(offset(0) + j*2*xexpansion, curHeight*xexpansion, offset(2) + i*2*zexpansion);
             
             MV->pushMatrix();
             MV->translate(pos);

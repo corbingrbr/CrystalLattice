@@ -14,6 +14,7 @@ class Layer
 public:
 
     Layer(int rows, int cols, float restHeight, float expansion, Eigen::Vector3f color, std::shared_ptr<Shape> sphere);
+    Layer(int rows, int cols, float restHeight, float xexpansion, float zexpansion, Eigen::Vector3f color, std::shared_ptr<Shape> sphere);
     virtual ~Layer();
     void reset();
     void update();
@@ -26,10 +27,12 @@ private:
     int cols;
     float startHeight;
     float restHeight;
-    float expansion;
+    float xexpansion;
+    float zexpansion;
     float curHeight;
     float speed;
     bool atRest;
+    bool staggered;
     Eigen::Vector3f color;
     Eigen::Vector3f offset;
     std::shared_ptr<Shape> sphere;

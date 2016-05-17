@@ -72,13 +72,13 @@ void Crystal::init()
 
 void Crystal::draw(shared_ptr<MatrixStack> MV, const shared_ptr<Program> prog)
 {
-    if (layersDraw) {
+    //if (layersDraw) {
         drawLayers(MV, prog);
-    } else if (inspecting) {
-        drawInspect(MV, prog);
-    } else {
-        drawCells(MV, prog);
-    }
+        //} else if (inspecting) {
+        //drawInspect(MV, prog);
+        //} else {
+        //drawCells(MV, prog);
+        //}
    
 }
 
@@ -128,7 +128,7 @@ void Crystal::drawLayers(shared_ptr<MatrixStack> MV, const std::shared_ptr<Progr
 
         // If last layer has fallen and settled, switch to other model for separation effects
         if (i == layers.size() - 1 && layers[i]->isAtRest()) {
-            toggleLayers();
+            //toggleLayers();
         }
     }
     
@@ -286,7 +286,7 @@ void Crystal::createBodyLayers()
 
 void Crystal::createFaceLayers()
 {
-    layers.push_back(make_shared<Layer>(4,4, -3, 1.40845, colors["grey"], sphere));
+    /*layers.push_back(make_shared<Layer>(4,4, -3, 1.40845, colors["grey"], sphere));
     layers.push_back(make_shared<Layer>(3,3, -3, 1.40845, colors["green"], sphere));
 
     layers.push_back(make_shared<Layer>(4,3, -2, 1.40845, colors["green"], sphere));
@@ -305,7 +305,28 @@ void Crystal::createFaceLayers()
     layers.push_back(make_shared<Layer>(3,4, 2, 1.40845, colors["green"], sphere));
     
     layers.push_back(make_shared<Layer>(4,4, 3, 1.40845, colors["grey"], sphere));
-    layers.push_back(make_shared<Layer>(3,3, 3, 1.40845, colors["green"], sphere));
+    layers.push_back(make_shared<Layer>(3,3, 3, 1.40845, colors["green"], sphere));*/
+    
+    float s = 2;
+
+    layers.push_back(make_shared<Layer>(4,1, -3.0*s, 1.0, 1.40845, colors["grey"], sphere));
+    layers.push_back(make_shared<Layer>(3,2, -2.5*s, 1.0, 1.40845, colors["orange"], sphere));
+    layers.push_back(make_shared<Layer>(4,3, -2.0*s, 1.0, 1.40845, colors["green"], sphere));
+   
+    layers.push_back(make_shared<Layer>(3,4, -1.5*s, 1.0, 1.40845, colors["grey"], sphere));
+    layers.push_back(make_shared<Layer>(4,5, -1.0*s, 1.0, 1.40845, colors["orange"], sphere));
+    layers.push_back(make_shared<Layer>(3,6, -0.5*s, 1.0, 1.40845, colors["green"], sphere));
+   
+    layers.push_back(make_shared<Layer>(4,7, 0, 1.0, 1.40845, colors["grey"], sphere));
+    
+    layers.push_back(make_shared<Layer>(3,6, 0.5*s, 1.0, 1.40845, colors["orange"], sphere));
+    layers.push_back(make_shared<Layer>(4,5, 1.0*s, 1.0, 1.40845, colors["green"], sphere));
+    layers.push_back(make_shared<Layer>(3,4, 1.5*s, 1.0, 1.40845, colors["grey"], sphere));
+
+    layers.push_back(make_shared<Layer>(4,3, 2.0*s, 1.0, 1.40845, colors["orange"], sphere));
+    layers.push_back(make_shared<Layer>(3,2, 2.5*s, 1.0, 1.40845, colors["green"], sphere));
+    layers.push_back(make_shared<Layer>(4,1, 3.0*s, 1.0, 1.40845, colors["grey"], sphere));
+    
 }
 
 void Crystal:: drawSimpleInspect(shared_ptr<MatrixStack> MV, const std::shared_ptr<Program> prog)
