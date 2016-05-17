@@ -50,6 +50,7 @@ void Crystal::init()
     colors["green"] = Vector3f(0, 1.0, 0);
     colors["blue"] = Vector3f(0, 0.7, 1.0);
     colors["orange"] = Vector3f(1.0, 0.6, 0.2);
+    colors["black"] = Vector3f(0, 0, 0);
 
     // Establish unit cell for particlar crystal
     switch (type) {
@@ -71,14 +72,14 @@ void Crystal::init()
 }
 
 void Crystal::draw(shared_ptr<MatrixStack> MV, const shared_ptr<Program> prog)
-{
-    //if (layersDraw) {
+{   
+    if (layersDraw) {
         drawLayers(MV, prog);
-        //} else if (inspecting) {
-        //drawInspect(MV, prog);
-        //} else {
-        //drawCells(MV, prog);
-        //}
+    } else if (inspecting) {
+        drawInspect(MV, prog);
+    } else {
+        drawCells(MV, prog);
+    }
    
 }
 
@@ -89,18 +90,23 @@ void Crystal::drawCells(shared_ptr<MatrixStack> MV, const shared_ptr<Program> pr
     float alpha = translucent ? 0.3 : 1.0;
 
     glUniform1f(prog->getUniform("alpha"), alpha);
-
     MV->pushMatrix();
-    MV->scale(scale);
     
-    unit->draw(MV, prog, Vector3f(0,0,0), alpha, true, Vector3d(1,1,1)); 
+    // Rotation of face-centered cubic so that it matches layering scheme
+    if (type == FACE) { MV->rotate(45, Vector3f(0,0,1)); }
+
+    MV->scale(scale);
+    unit->draw(MV, prog, Vector3f(0,0,0), alpha, true, Vector3d(1,1,1), Vector3d(2,2,2)); 
     
     for (unsigned int i = 0; i < cells.size(); i++) {
-        Vector3f v = cells[i].second.second.head<3>(); // Vector for cell positioning
-        Vector3d ndx = cells[i].second.first;
+        //Vector3f v = cells[i].second.second.head<3>(); 
+        Vector3f v = cells[i].pos.head(3);
+        // Vector for cell positioning
+        Vector3d bounds = cells[i].bounds;
+        Vector3d ndx = cells[i].ndx;
         v *= expansion; // Adjust cell positioning by any expansion
 
-        unit->draw(MV, prog, v, alpha, false, ndx); // Draw cell
+        unit->draw(MV, prog, v, alpha, false, bounds, ndx); // Draw cell
     }
 
     MV->popMatrix();
@@ -128,7 +134,7 @@ void Crystal::drawLayers(shared_ptr<MatrixStack> MV, const std::shared_ptr<Progr
 
         // If last layer has fallen and settled, switch to other model for separation effects
         if (i == layers.size() - 1 && layers[i]->isAtRest()) {
-            //toggleLayers();
+            toggleLayers();
         }
     }
     
@@ -244,10 +250,13 @@ void Crystal::initCellPositions()
                     if (k == 1) { z = UnitCell::ONEB4MIN; }
 
 
-                    Vector3d ndx(y, z, x);
+                    Vector3d bounds(y, z, x);
                     Vector4f pos(o(0) + j*2, o(1) + k*2, o(2) + i*2 , 1);
+                    Vector3d ndx(i, j, k);
 
-                    cells.push_back(make_pair(0, make_pair(ndx, pos)));
+                    Cell c(bounds, pos, ndx);
+                    
+                    cells.push_back(c);
                 }
             }
         }
@@ -258,9 +267,10 @@ void Crystal::sortCells(Matrix4f viewMatrix)
 {
     // Calculate all cells distances
     for (unsigned int i = 0; i < cells.size(); i++) {
-        cells[i].first = calcCellDistance(viewMatrix, cells[i].second.second);
+        // Calculate cell distance from camera
+        cells[i].distance = calcCellDistance(viewMatrix, cells[i].pos);
     }
-    
+
     // Sort cells in descending order by distance from camera
     sort(cells.begin(), cells.end(), sortAlg);
 }
@@ -285,28 +295,7 @@ void Crystal::createBodyLayers()
 }
 
 void Crystal::createFaceLayers()
-{
-    /*layers.push_back(make_shared<Layer>(4,4, -3, 1.40845, colors["grey"], sphere));
-    layers.push_back(make_shared<Layer>(3,3, -3, 1.40845, colors["green"], sphere));
-
-    layers.push_back(make_shared<Layer>(4,3, -2, 1.40845, colors["green"], sphere));
-    layers.push_back(make_shared<Layer>(3,4, -2, 1.40845, colors["green"], sphere));
-
-    layers.push_back(make_shared<Layer>(4,4, -1, 1.40845, colors["grey"], sphere));
-    layers.push_back(make_shared<Layer>(3,3, -1, 1.40845, colors["green"], sphere));
-    
-    layers.push_back(make_shared<Layer>(4,3, 0, 1.40845, colors["green"], sphere));
-    layers.push_back(make_shared<Layer>(3,4, 0, 1.40845, colors["green"], sphere));
-    
-    layers.push_back(make_shared<Layer>(4,4, 1, 1.40845, colors["grey"], sphere));
-    layers.push_back(make_shared<Layer>(3,3, 1, 1.40845, colors["green"], sphere));
-
-    layers.push_back(make_shared<Layer>(4,3, 2, 1.40845, colors["green"], sphere));
-    layers.push_back(make_shared<Layer>(3,4, 2, 1.40845, colors["green"], sphere));
-    
-    layers.push_back(make_shared<Layer>(4,4, 3, 1.40845, colors["grey"], sphere));
-    layers.push_back(make_shared<Layer>(3,3, 3, 1.40845, colors["green"], sphere));*/
-    
+{  
     float s = 2;
 
     layers.push_back(make_shared<Layer>(4,1, -3.0*s, 1.0, 1.40845, colors["grey"], sphere));

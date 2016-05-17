@@ -133,6 +133,7 @@ static void init()
 
 void render()
 {
+
 	// Get current frame buffer size.
 	int width, height;
 	glfwGetFramebufferSize(window, &width, &height);
@@ -233,8 +234,8 @@ int main(int argc, char **argv)
 		cout << "Please specify the resource directory." << endl;
 		return 0;
 	}
-	
-    cout << glGetString(GL_SHADING_LANGUAGE_VERSION) << endl;
+
+    //cout << glGetString(GL_SHADING_LANGUAGE_VERSION) << endl;
 
     RESOURCE_DIR = argv[1] + string("/");
 	
@@ -245,11 +246,14 @@ int main(int argc, char **argv)
 		return -1;
 	}
 	// Create a windowed mode window and its OpenGL context.
+
+
 	window = glfwCreateWindow(1200, 900, "Crystal Lattice", NULL, NULL);
 	if(!window) {
 		glfwTerminate();
 		return -1;
 	}
+
 	// Make the window's context current.
 	glfwMakeContextCurrent(window);
 	// Initialize GLEW.
@@ -258,6 +262,7 @@ int main(int argc, char **argv)
 		cerr << "Failed to initialize GLEW" << endl;
 		return -1;
 	}
+
 	glGetError(); // A bug in glewInit() causes an error that we can safely ignore.
 	cout << "OpenGL version: " << glGetString(GL_VERSION) << endl;
 	cout << "GLSL version: " << glGetString(GL_SHADING_LANGUAGE_VERSION) << endl;
@@ -273,8 +278,10 @@ int main(int argc, char **argv)
 	glfwSetMouseButtonCallback(window, mouse_button_callback);
 	// Initialize scene.
 	init();
+
 	// Loop until the user closes the window.
 	while(!glfwWindowShouldClose(window)) {
+
 		// Render scene.
 		render();
 		// Swap front and back buffers.

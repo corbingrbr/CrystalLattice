@@ -35,8 +35,19 @@ public:
     void toggleInspection();
 
 private:
+    
+    struct Cell 
+    {
+        float distance;
+        Eigen::Vector3d bounds;
+        Eigen::Vector4f pos;
+        Eigen::Vector3d ndx;
 
-     void drawCells(std::shared_ptr<MatrixStack> MV, const std::shared_ptr<Program> prog);
+    Cell(Eigen::Vector3d bounds, Eigen::Vector4f pos, Eigen::Vector3d ndx) : distance(0.0), bounds(bounds), pos(pos), ndx(ndx) {}
+    };
+    
+
+    void drawCells(std::shared_ptr<MatrixStack> MV, const std::shared_ptr<Program> prog);
     void drawLayers(std::shared_ptr<MatrixStack> MV, const std::shared_ptr<Program> prog);
     void drawInspect(std::shared_ptr<MatrixStack> MV, const std::shared_ptr<Program> prog);
 
@@ -44,9 +55,14 @@ private:
     float calcCellDistance(Eigen::Matrix4f m, Eigen::Vector4f v);
     void sortCells(Eigen::Matrix4f viewMatrix);
     
-    static bool sortAlg(std::pair<float, std::pair<Eigen::Vector3d, Eigen::Vector4f> > i, std::pair<float, std::pair<Eigen::Vector3d, Eigen::Vector4f> > j)
+    /*static bool sortAlg(std::pair<float, std::pair<Eigen::Vector3d, Eigen::Vector4f> > i, std::pair<float, std::pair<Eigen::Vector3d, Eigen::Vector4f> > j)
     {
         return i.first > j.first;
+        }*/
+
+    static bool sortAlg(Cell c1, Cell c2)
+    {
+        return c1.distance > c2.distance;
     }
 
     void createSimpleLayers();
@@ -76,7 +92,8 @@ private:
     std::shared_ptr<Shape> half;
     std::shared_ptr<Shape> sphere;
     std::map<std::string, Eigen::Vector3f> colors;
-    std::vector<std::pair<float, std::pair<Eigen::Vector3d, Eigen::Vector4f> > > cells;
+    //std::vector<std::pair<float, std::pair<Eigen::Vector3d, Eigen::Vector4f> > > cells;
+    std::vector<Cell> cells;
     std::vector<std::shared_ptr<Layer> > layers;
 };
 

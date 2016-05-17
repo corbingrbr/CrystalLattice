@@ -24,7 +24,7 @@ UnitCell(std::shared_ptr<Shape> eighth, std::shared_ptr<Shape> half, std::shared
         colors(colors),
         scale(1.0){}
     
-    virtual void draw(std::shared_ptr<MatrixStack> MV, std::shared_ptr<Program> prog, Eigen::Vector3f pos, float alpha, bool center, Eigen::Vector3d ndx) = 0;    
+    virtual void draw(std::shared_ptr<MatrixStack> MV, std::shared_ptr<Program> prog, Eigen::Vector3f pos, float alpha, bool center, Eigen::Vector3d bounds, Eigen::Vector3d ndx) = 0;    
 
 protected:
 
