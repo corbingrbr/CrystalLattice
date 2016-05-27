@@ -73,10 +73,10 @@ void Crystal::init()
 
 void Crystal::draw(shared_ptr<MatrixStack> MV, const shared_ptr<Program> prog)
 {   
-    if (layersDraw) {
-        drawLayers(MV, prog);
-    } else if (inspecting) {
+    if (inspecting) {
         drawInspect(MV, prog);
+    } else if (layersDraw) {
+        drawLayers(MV, prog);
     } else {
         drawCells(MV, prog);
     }
@@ -159,7 +159,7 @@ void Crystal::drawInspect(shared_ptr<MatrixStack> MV, const std::shared_ptr<Prog
 void Crystal::expand()
 {
     if (inspecting) {
-        if (inspctExp < .4) { inspctExp += .1; }
+        if (inspctExp < 0.6) { inspctExp += .2; }
     } else {
         if (expansion < 4.0) { expansion += .2; }
     }
@@ -168,7 +168,7 @@ void Crystal::expand()
 void Crystal::contract()
 {
     if (inspecting) {
-        if (inspctExp > 0) { inspctExp -= .1; }
+        if (inspctExp > 0.2) { inspctExp -= .2; }
     } else {
         if (expansion > 1.0) { expansion -= .2; }
     }
@@ -181,26 +181,28 @@ void Crystal::toggleTranslucency()
 
 void Crystal::setDrawLayers()
 {
+    toggleLayers();
     layersDraw = true;
 }
 
 void Crystal::toggleLayers()
 {
-    layersDraw = !layersDraw;
-    
-    for (unsigned int i = 0; i < layers.size(); i++) {
-        layers[i]->reset();
-    }
-
-    expansion = 1.0;
-    inspctExp = 1.0;
-    translucent = false;
+    if (!inspecting) {
+        layersDraw = !layersDraw;
+        
+        for (unsigned int i = 0; i < layers.size(); i++) {
+            layers[i]->reset();
+        }
+        
+        expansion = 1.0;
+        inspctExp = 1.0;
+        translucent = false;
+    }    
 }
 
 void Crystal::toggleInspection()
 {
-    if (layersDraw) { toggleLayers(); }
-    
+    inspctExp = 0.0f;
     inspecting = !inspecting;
 }
 
@@ -325,21 +327,20 @@ void Crystal:: drawSimpleInspect(shared_ptr<MatrixStack> MV, const std::shared_p
     glUniform3fv(prog->getUniform("kdFront"), 1, colors["blue"].data());
     
     MV->pushMatrix();
-    
-    drawEighth(MV, prog, 0); 
-    drawEighth(MV, prog, 90); 
-    drawEighth(MV, prog, 180); 
-    drawEighth(MV, prog, 270); 
+    drawEighth(MV, prog, 0, Vector3f(-inspctExp, inspctExp, inspctExp)); 
+    drawEighth(MV, prog, 90, Vector3f(-inspctExp, inspctExp, inspctExp)); 
+    drawEighth(MV, prog, 180, Vector3f(-inspctExp, inspctExp, inspctExp)); 
+    drawEighth(MV, prog, 270, Vector3f(-inspctExp, inspctExp, inspctExp)); 
     
     MV->pushMatrix();
     MV->rotate(90.0f, Vector3f(1.0, 0.0, 0.0));
-    drawEighth(MV, prog, 0); 
-    drawEighth(MV, prog, 90); 
+    drawEighth(MV, prog, 0, Vector3f(-inspctExp, inspctExp, inspctExp)); 
+    drawEighth(MV, prog, 90, Vector3f(-inspctExp, inspctExp, inspctExp)); 
     
     MV->rotate(180.0f, Vector3f(1.0, 0.0, 0.0));
 
-    drawEighth(MV, prog, 180); 
-    drawEighth(MV, prog, 270); 
+    drawEighth(MV, prog, 180, Vector3f(-inspctExp, inspctExp, inspctExp)); 
+    drawEighth(MV, prog, 270, Vector3f(-inspctExp, inspctExp, inspctExp)); 
     
     MV->popMatrix();
     
@@ -348,17 +349,109 @@ void Crystal:: drawSimpleInspect(shared_ptr<MatrixStack> MV, const std::shared_p
 
 void Crystal::drawBodyInspect(shared_ptr<MatrixStack> MV, const shared_ptr<Program> prog)
 {
+    glUniform1f(prog->getUniform("alpha"), 1.0);
+    glUniform3fv(prog->getUniform("kdFront"), 1, colors["grey"].data());
+    
+    MV->pushMatrix();
+    MV->translate(Vector3f(-inspctExp/20 - 0.15, 0, 0));
+    drawEighth(MV, prog, 0, Vector3f(-inspctExp, inspctExp, inspctExp)); 
+    drawEighth(MV, prog, 90, Vector3f(-inspctExp, inspctExp, inspctExp)); 
+    drawEighth(MV, prog, 180, Vector3f(-inspctExp, inspctExp, inspctExp)); 
+    drawEighth(MV, prog, 270, Vector3f(-inspctExp, inspctExp, inspctExp)); 
+    
+    MV->pushMatrix();
+    MV->rotate(90.0f, Vector3f(1.0, 0.0, 0.0));
+    drawEighth(MV, prog, 0, Vector3f(-inspctExp, inspctExp, inspctExp)); 
+    drawEighth(MV, prog, 90, Vector3f(-inspctExp, inspctExp, inspctExp)); 
+    
+    MV->rotate(180.0f, Vector3f(1.0, 0.0, 0.0));
+
+    drawEighth(MV, prog, 180, Vector3f(-inspctExp, inspctExp, inspctExp)); 
+    drawEighth(MV, prog, 270, Vector3f(-inspctExp, inspctExp, inspctExp)); 
+    
+    MV->popMatrix();    
+    MV->popMatrix();
+
+    glUniform3fv(prog->getUniform("kdFront"), 1, colors["red"].data());
+    
+    MV->pushMatrix();
+    MV->translate(Vector3f(.15,0,0));
+    MV->scale(scale);
+    glUniformMatrix4fv(prog->getUniform("MV"), 1, GL_FALSE, MV->topMatrix().data());
+    sphere->draw(prog);
+    MV->popMatrix();
+
 }
 
 void Crystal::drawFaceInspect(shared_ptr<MatrixStack> MV, const shared_ptr<Program> prog)
 {
+    glUniform1f(prog->getUniform("alpha"), 1.0);
+    glUniform3fv(prog->getUniform("kdFront"), 1, colors["grey"].data());
+    MV->pushMatrix();
+    MV->translate(Vector3f(-0.45*1.1, 0, 0));
+    drawEighth(MV, prog, 0, Vector3f(-inspctExp, inspctExp, inspctExp)); 
+    drawEighth(MV, prog, 90, Vector3f(-inspctExp, inspctExp, inspctExp)); 
+    drawEighth(MV, prog, 180, Vector3f(-inspctExp, inspctExp, inspctExp)); 
+    drawEighth(MV, prog, 270, Vector3f(-inspctExp, inspctExp, inspctExp)); 
+    
+    MV->pushMatrix();
+    MV->rotate(90.0f, Vector3f(1.0, 0.0, 0.0));
+    drawEighth(MV, prog, 0, Vector3f(-inspctExp, inspctExp, inspctExp)); 
+    drawEighth(MV, prog, 90, Vector3f(-inspctExp, inspctExp, inspctExp)); 
+    
+    MV->rotate(180.0f, Vector3f(1.0, 0.0, 0.0));
+
+    drawEighth(MV, prog, 180, Vector3f(-inspctExp, inspctExp, inspctExp)); 
+    drawEighth(MV, prog, 270, Vector3f(-inspctExp, inspctExp, inspctExp)); 
+    
+    MV->popMatrix();    
+    MV->popMatrix();
+
+    glUniform3fv(prog->getUniform("kdFront"), 1, colors["green"].data());
+    MV->pushMatrix();
+    MV->translate(Vector3f(-0.15*1.1, 0, 0));
+    drawHalf(MV, prog, 0, Vector3f(inspctExp + 1.0, 0, 0));
+    drawHalf(MV, prog, 180, Vector3f(inspctExp + 1.0, 0, 0));
+    MV->popMatrix();
+    
+
+    glUniform3fv(prog->getUniform("kdFront"), 1, colors["orange"].data());
+    MV->pushMatrix();
+    MV->translate(Vector3f(0.15*1.1, 0, 0));
+    drawHalf(MV, prog, 0, Vector3f(inspctExp + 1.0, 0, 0));
+    drawHalf(MV, prog, 180, Vector3f(inspctExp + 1.0, 0, 0));
+    MV->popMatrix();
+    
+    glUniform3fv(prog->getUniform("kdFront"), 1, colors["grey"].data());
+    MV->pushMatrix();
+    MV->translate(Vector3f(0.45*1.1, 0, 0));
+    drawHalf(MV, prog, 0, Vector3f(inspctExp + 1.0, 0, 0));
+    drawHalf(MV, prog, 180, Vector3f(inspctExp + 1.0, 0, 0));
+    MV->popMatrix();
+    
+     
 }
 
-void Crystal::drawEighth(shared_ptr<MatrixStack> MV, shared_ptr<Program> prog, float rot) {
+void Crystal::drawHalf(shared_ptr<MatrixStack> MV, shared_ptr<Program> prog, float rot, Vector3f translate) 
+{
+    MV->pushMatrix();
+    MV->scale(scale);
+    MV->rotate(rot, Vector3f(0, 1, 0));
+    MV->translate(translate);
+    glUniformMatrix4fv(prog->getUniform("MV"), 1, GL_FALSE, MV->topMatrix().data());
+    half->draw(prog);
+
+    MV->popMatrix();
+}
+
+
+void Crystal::drawEighth(shared_ptr<MatrixStack> MV, shared_ptr<Program> prog, float rot, Vector3f translate)
+{
     
     MV->pushMatrix();
     MV->rotate(rot, Vector3f(0.0, 1.0, 0.0));
     MV->scale(scale);
+    MV->translate(translate);
     glUniformMatrix4fv(prog->getUniform("MV"), 1, GL_FALSE, MV->topMatrix().data());
     eighth->draw(prog);
     

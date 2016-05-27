@@ -33,16 +33,14 @@ void Scene::load(const string &RESOURCE_DIR)
     sphere->loadMesh(RESOURCE_DIR + "sphere.obj");
     sphere->init();
 
-    crystals.push_back(make_shared<Crystal>(Crystal::FACE, eighth, half, sphere));
-    crystals.back()->init();
-
     crystals.push_back(make_shared<Crystal>(Crystal::SIMPLE, eighth, half, sphere));
     crystals.back()->init();
     
     crystals.push_back(make_shared<Crystal>(Crystal::BODY, eighth, half, sphere));
     crystals.back()->init();
-
     
+    crystals.push_back(make_shared<Crystal>(Crystal::FACE, eighth, half, sphere));
+    crystals.back()->init();
 }
 
 void Scene::nextCrystal()

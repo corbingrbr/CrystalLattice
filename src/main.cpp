@@ -59,8 +59,8 @@ static void char_callback(GLFWwindow *window, unsigned int key)
         break;
     case 'l': scene->toggleLayers();
         break;
-        //case 'i': scene->toggleInspection();
-        //break;
+    case 'i': scene->toggleInspection();
+        break;
 	}
 }
 

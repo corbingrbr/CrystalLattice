@@ -54,11 +54,6 @@ private:
     void initCellPositions();
     float calcCellDistance(Eigen::Matrix4f m, Eigen::Vector4f v);
     void sortCells(Eigen::Matrix4f viewMatrix);
-    
-    /*static bool sortAlg(std::pair<float, std::pair<Eigen::Vector3d, Eigen::Vector4f> > i, std::pair<float, std::pair<Eigen::Vector3d, Eigen::Vector4f> > j)
-    {
-        return i.first > j.first;
-        }*/
 
     static bool sortAlg(Cell c1, Cell c2)
     {
@@ -72,8 +67,8 @@ private:
     void drawSimpleInspect(std::shared_ptr<MatrixStack> MV, const std::shared_ptr<Program> prog);
     void drawBodyInspect(std::shared_ptr<MatrixStack> MV, const std::shared_ptr<Program> prog);
     void drawFaceInspect(std::shared_ptr<MatrixStack> MV, const std::shared_ptr<Program> prog);
-    void drawEighth(std::shared_ptr<MatrixStack> MV, std::shared_ptr<Program> prog, float rot);
-    
+    void drawEighth(std::shared_ptr<MatrixStack> MV, std::shared_ptr<Program> prog, float rot, Eigen::Vector3f translate);
+    void drawHalf(std::shared_ptr<MatrixStack> MV, std::shared_ptr<Program> prog, float rot, Eigen::Vector3f translate);
 
     int type;
     int rows;
@@ -92,7 +87,6 @@ private:
     std::shared_ptr<Shape> half;
     std::shared_ptr<Shape> sphere;
     std::map<std::string, Eigen::Vector3f> colors;
-    //std::vector<std::pair<float, std::pair<Eigen::Vector3d, Eigen::Vector4f> > > cells;
     std::vector<Cell> cells;
     std::vector<std::shared_ptr<Layer> > layers;
 };

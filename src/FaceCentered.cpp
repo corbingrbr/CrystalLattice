@@ -140,6 +140,7 @@ void FaceCentered::drawHalf(shared_ptr<MatrixStack> MV, shared_ptr<Program> prog
     MV->rotate(rot, axis);
     MV->translate(Vector3f(-1.0,0,0)*(1-scale));
     MV->scale(scale);
+    MV->translate(Vector3f(-.01, 0, 0));
     glUniformMatrix4fv(prog->getUniform("MV"), 1, GL_FALSE, MV->topMatrix().data());
     half->draw(prog);
 
@@ -150,6 +151,10 @@ Vector3f FaceCentered::whichColor(int x, int y, int z, int id)
 {  
    
     int key = (z + y) % 3; 
+
+    // g, gr, o: 1, 5, 12, 13
+    // o, g, gr: 2, 4, 6, 8, 9, 10, 11
+    // gr, o, g: 3, 7, 11, 14 
 
     switch (id) {
         
