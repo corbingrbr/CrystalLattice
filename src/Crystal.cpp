@@ -99,7 +99,6 @@ void Crystal::drawCells(shared_ptr<MatrixStack> MV, const shared_ptr<Program> pr
     unit->draw(MV, prog, Vector3f(0,0,0), alpha, true, Vector3d(1,1,1), Vector3d(2,2,2)); 
     
     for (unsigned int i = 0; i < cells.size(); i++) {
-        //Vector3f v = cells[i].second.second.head<3>(); 
         Vector3f v = cells[i].pos.head(3);
         // Vector for cell positioning
         Vector3d bounds = cells[i].bounds;
@@ -132,7 +131,7 @@ void Crystal::drawLayers(shared_ptr<MatrixStack> MV, const std::shared_ptr<Progr
             break;
         }
 
-        // If last layer has fallen and settled, switch to other model for separation effects
+        // If last layer has fallen and settled, switch to other model for expand/contract effects
         if (i == layers.size() - 1 && layers[i]->isAtRest()) {
             toggleLayers();
         }
@@ -265,17 +264,20 @@ void Crystal::initCellPositions()
     }
 }
 
+
 void Crystal::sortCells(Matrix4f viewMatrix)
 {
-    // Calculate all cells distances
+    // Calculate distance of each cell to the camera
     for (unsigned int i = 0; i < cells.size(); i++) {
-        // Calculate cell distance from camera
+
         cells[i].distance = calcCellDistance(viewMatrix, cells[i].pos);
+
     }
 
-    // Sort cells in descending order by distance from camera
+    // Sort cells in descending order by their distance
     sort(cells.begin(), cells.end(), sortAlg);
 }
+
 
 void Crystal::createSimpleLayers()
 {

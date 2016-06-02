@@ -19,6 +19,8 @@
 #include "Scene.h"
 #include "Crystal.h"
 
+#define DRAW_GRID false
+
 using namespace std;
 using namespace Eigen;
 
@@ -131,46 +133,8 @@ static void init()
 	GLSL::checkError(GET_FILE_LINE);
 }
 
-void render()
+void drawGrid()
 {
-
-	// Get current frame buffer size.
-	int width, height;
-	glfwGetFramebufferSize(window, &width, &height);
-	glViewport(0, 0, width, height);
-	
-	// Use the window size for camera.
-	glfwGetWindowSize(window, &width, &height);
-	camera->setAspect((float)width/(float)height);
-	
-	// Clear buffers
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	/*if(keyToggles[(unsigned)'c']) {
-		glEnable(GL_CULL_FACE);
-	} else {
-		glDisable(GL_CULL_FACE);
-        }
-	if(keyToggles[(unsigned)'l']) {
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	} else {
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-        }*/
-
-    
-	
-	auto P = make_shared<MatrixStack>();
-	auto MV = make_shared<MatrixStack>();
-	
-	// Apply camera transforms
-	P->pushMatrix();
-	camera->applyProjectionMatrix(P);
-	MV->pushMatrix();
-	camera->applyViewMatrix(MV);
-
-	// Draw grid
-	progSimple->bind();
-	glUniformMatrix4fv(progSimple->getUniform("P"), 1, GL_FALSE, P->topMatrix().data());
-	glUniformMatrix4fv(progSimple->getUniform("MV"), 1, GL_FALSE, MV->topMatrix().data());
 	glLineWidth(2.0f);
 	float x0 = -0.5f;
 	float x1 = 0.5f;
@@ -207,9 +171,41 @@ void render()
 	glVertex3f(x1, 0.0f, z1);
 	glVertex3f(x0, 0.0f, z1);
 	glEnd();
+}
 
-    progSimple->unbind();
-    
+void render()
+{
+
+	// Get current frame buffer size.
+	int width, height;
+	glfwGetFramebufferSize(window, &width, &height);
+	glViewport(0, 0, width, height);
+	
+	// Use the window size for camera.
+	glfwGetWindowSize(window, &width, &height);
+	camera->setAspect((float)width/(float)height);
+	
+	// Clear buffers
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);    
+	
+	auto P = make_shared<MatrixStack>();
+	auto MV = make_shared<MatrixStack>();
+	
+	// Apply camera transforms
+	P->pushMatrix();
+	camera->applyProjectionMatrix(P);
+	MV->pushMatrix();
+	camera->applyViewMatrix(MV);
+
+	// Draw grid
+    if (DRAW_GRID) {
+        progSimple->bind();
+        glUniformMatrix4fv(progSimple->getUniform("P"), 1, GL_FALSE, P->topMatrix().data());
+        glUniformMatrix4fv(progSimple->getUniform("MV"), 1, GL_FALSE, MV->topMatrix().data());
+        drawGrid();
+        progSimple->unbind();
+    }
+
     // Draw scene
     prog->bind();
     glUniformMatrix4fv(prog->getUniform("P"), 1, GL_FALSE, P->topMatrix().data());
@@ -294,3 +290,4 @@ int main(int argc, char **argv)
 	glfwTerminate();
 	return 0;
 }
+
